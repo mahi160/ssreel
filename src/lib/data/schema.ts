@@ -9,6 +9,7 @@ export interface Article {
 	headline: string;
 	excerpt: string;
 	body: string;
+	image?: string; // same-origin path, absent if this article has no usable image
 	section: Section;
 	url: string;
 	source: string;

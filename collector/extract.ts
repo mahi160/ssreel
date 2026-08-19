@@ -15,6 +15,7 @@ function trim(text: string, max: number): string {
 export interface Extracted {
 	excerpt: string;
 	body: string;
+	imageUrl?: string;
 }
 
 /** Fetches and extracts an article's body. Returns undefined on any failure — the caller falls back to the feed's own summary. */
@@ -29,13 +30,17 @@ export async function extractArticle(url: string): Promise<Extracted | undefined
 
 		// jsdom logs unparsable stylesheets to console by default; publisher pages are noisy.
 		const dom = new JSDOM(html, { url, virtualConsole: new VirtualConsole() });
-		const text = new Readability(dom.window.document)
-			.parse()
-			?.textContent?.trim()
-			.replace(/\s+/g, ' ');
+		const { document } = dom.window;
+		const text = new Readability(document).parse()?.textContent?.trim().replace(/\s+/g, ' ');
 		if (!text) return undefined;
 
-		return { body: trim(text, MAX_BODY_CHARS), excerpt: trim(text, MAX_EXCERPT_CHARS) };
+		const rawImageUrl =
+			document.querySelector('meta[property="og:image"]')?.getAttribute('content') ??
+			document.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
+		// Resolved against the article's URL: some publishers use a path, not an absolute URL.
+		const imageUrl = rawImageUrl ? new URL(rawImageUrl, url).toString() : undefined;
+
+		return { body: trim(text, MAX_BODY_CHARS), excerpt: trim(text, MAX_EXCERPT_CHARS), imageUrl };
 	} catch {
 		return undefined;
 	}

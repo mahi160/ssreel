@@ -3,6 +3,7 @@
 	import { markRead } from '#lib/data/db.js';
 	import { dwellTracker } from './dwell.js';
 	import * as Card from '@/ui/card/index.js';
+	import { cn } from '@/utils.js';
 
 	let { articles, onRead }: { articles: StoredArticle[]; onRead: (id: string) => void } = $props();
 
@@ -18,7 +19,12 @@
 			class="flex h-dvh w-full snap-start snap-always items-center justify-center p-4"
 			use:dwellTracker={(dwellMs) => read(article.id, dwellMs)}
 		>
-			<Card.Root class="h-full w-full max-w-md justify-center overflow-y-auto">
+			<Card.Root
+				class={cn('h-full w-full max-w-md overflow-y-auto', !article.image && 'justify-center')}
+			>
+				{#if article.image}
+					<img src={article.image} alt="" class="aspect-video w-full object-cover" loading="lazy" />
+				{/if}
 				<Card.Header>
 					<Card.Description>{article.source} · {article.section}</Card.Description>
 					<Card.Title class="text-2xl">{article.headline}</Card.Title>

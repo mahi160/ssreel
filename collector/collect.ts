@@ -5,6 +5,7 @@ import path from 'node:path';
 import Parser from 'rss-parser';
 import { articleId } from './id.ts';
 import { extractArticle, MAX_EXCERPT_CHARS } from './extract.ts';
+import { processImage } from './image.ts';
 import { classifySection } from './section.ts';
 import { loadSeenIds, saveSeenIds } from './dedupe.ts';
 import { orderByWeight } from './weight.ts';
@@ -37,11 +38,14 @@ async function collectSource(source: Source, runId: string): Promise<Article[]> 
 				const excerpt = extracted?.excerpt ?? trimToExcerpt(fallback);
 				if (!body) return undefined; // nothing readable at all
 
+				const image = extracted?.imageUrl ? await processImage(extracted.imageUrl, id) : undefined;
+
 				return {
 					id,
 					headline: item.title!,
 					excerpt,
 					body,
+					image,
 					section: classifySection(item.link!, item.categories ?? [], source.defaultSection),
 					url: item.link!,
 					source: source.name,
