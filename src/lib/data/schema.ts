@@ -2,9 +2,14 @@
 // Shared, type-only, between the collector (Node) and the client — importing
 // only types here never pulls collector runtime code into the client bundle.
 
+export type Section = 'Local' | 'International' | 'Entertainment' | 'Tech' | 'Sports';
+
 export interface Article {
 	id: string;
 	headline: string;
+	excerpt: string;
+	body: string;
+	section: Section;
 	url: string;
 	source: string;
 	publishedAt: string; // ISO 8601

@@ -4,6 +4,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Parser from 'rss-parser';
 import { articleId } from './id.ts';
+import { extractArticle, MAX_EXCERPT_CHARS } from './extract.ts';
+import { classifySection } from './section.ts';
+import { loadSeenIds, saveSeenIds } from './dedupe.ts';
+import { orderByWeight } from './weight.ts';
 import { SOURCES, type Source } from './sources.ts';
 import type { Article, Index, Run } from '../src/lib/data/schema.ts';
 
@@ -13,28 +17,44 @@ const RUNS_DIR = path.join(OUT_DIR, 'runs');
 
 const parser = new Parser();
 
+function trimToExcerpt(text: string): string {
+	return text.length <= MAX_EXCERPT_CHARS ? text : text.slice(0, MAX_EXCERPT_CHARS) + '\u2026';
+}
+
 async function collectSource(source: Source, runId: string): Promise<Article[]> {
 	const feed = await parser.parseURL(source.feedUrl);
-	const articles: Article[] = [];
-	for (const item of feed.items) {
-		// A malformed entry (no link/title, or an unparsable URL) is skipped, not fatal (ticket 03).
-		if (!item.link || !item.title) continue;
-		let id: string;
-		try {
-			id = articleId(item.link);
-		} catch {
-			continue;
-		}
-		articles.push({
-			id,
-			headline: item.title,
-			url: item.link,
-			source: source.name,
-			publishedAt: item.isoDate ?? new Date().toISOString(),
-			runId
-		});
-	}
-	return articles;
+
+	const items = feed.items.filter((item) => item.link && item.title);
+	const articles = await Promise.all(
+		items.map(async (item): Promise<Article | undefined> => {
+			// Any failure here (bad URL, bad markup, ...) is one malformed entry,
+			// skipped without discarding the valid entries around it.
+			try {
+				const id = articleId(item.link!);
+				const extracted = await extractArticle(item.link!);
+				const fallback = item.contentSnippet ?? item.content ?? '';
+				const body = extracted?.body ?? fallback;
+				const excerpt = extracted?.excerpt ?? trimToExcerpt(fallback);
+				if (!body) return undefined; // nothing readable at all
+
+				return {
+					id,
+					headline: item.title!,
+					excerpt,
+					body,
+					section: classifySection(item.link!, item.categories ?? [], source.defaultSection),
+					url: item.link!,
+					source: source.name,
+					publishedAt: item.isoDate ?? new Date().toISOString(),
+					runId
+				};
+			} catch {
+				return undefined;
+			}
+		})
+	);
+
+	return articles.filter((a) => a !== undefined);
 }
 
 async function readIndex(): Promise<Index> {
@@ -49,12 +69,16 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 	const runId = new Date().toISOString().replace(/[:.]/g, '-');
 	const results = await Promise.allSettled(sources.map((s) => collectSource(s, runId)));
 
-	const articles: Article[] = [];
+	let articles: Article[] = [];
 	for (const [i, result] of results.entries()) {
 		if (result.status === 'fulfilled') articles.push(...result.value);
-		// One outlet failing must not fail the run (ticket 03) — logged, not thrown.
+		// One outlet failing, timing out or erroring must not fail the run.
 		else console.error(`collector: ${sources[i].name} failed:`, result.reason);
 	}
+
+	const seen = await loadSeenIds();
+	articles = articles.filter((a) => !seen.has(a.id));
+	articles = orderByWeight(articles, sources);
 
 	const run: Run = { id: runId, generatedAt: new Date().toISOString(), articles };
 
@@ -66,6 +90,13 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 		b.publishedAt.localeCompare(a.publishedAt)
 	);
 	await writeFile(INDEX_PATH, JSON.stringify(index, null, '\t'));
+
+	// ponytail: state is saved after the run/index are written, not atomically
+	// with them. A crash in between means the next run may re-collect and
+	// re-publish this run's articles as "new" — a visible, harmless duplicate
+	// (ADR-0007), not data loss.
+	for (const a of articles) seen.add(a.id);
+	await saveSeenIds(seen);
 
 	return run;
 }

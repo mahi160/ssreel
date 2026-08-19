@@ -24,7 +24,9 @@ const TRACKING_PARAMS = new Set([
 	'igshid',
 	'_ga',
 	'yclid',
-	'twclid'
+	'twclid',
+	'at_medium',
+	'at_campaign'
 ]);
 
 /** Host lowercased, fragment dropped, tracking params stripped, remaining params sorted. */
