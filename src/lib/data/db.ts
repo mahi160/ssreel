@@ -84,6 +84,15 @@ export async function allArticles(): Promise<StoredArticle[]> {
 	return db.getAll('articles');
 }
 
+/** Wipes every stored article and run — the device forgets everything it's synced. */
+export async function clearAllArticles(): Promise<void> {
+	const db = await getDb();
+	const tx = db.transaction(['articles', 'runs'], 'readwrite');
+	await tx.objectStore('articles').clear();
+	await tx.objectStore('runs').clear();
+	await tx.done;
+}
+
 export async function getArticle(id: string): Promise<StoredArticle | undefined> {
 	const db = await getDb();
 	return db.get('articles', id);

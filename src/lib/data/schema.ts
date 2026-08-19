@@ -3,6 +3,7 @@
 // only types here never pulls collector runtime code into the client bundle.
 
 export type Section = 'Local' | 'International' | 'Entertainment' | 'Tech' | 'Sports';
+export const SECTIONS: Section[] = ['Local', 'International', 'Entertainment', 'Tech', 'Sports'];
 
 export interface Article {
 	id: string;

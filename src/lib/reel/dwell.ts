@@ -1,10 +1,13 @@
 // Crossing this threshold while a card is the active one is what marks an
-// article read (ADR-0008); a fast flick past leaves it unread.
-export const DWELL_MS = 4000;
+// article read (ADR-0008); a fast flick past leaves it unread. The threshold
+// is a per-device setting (src/lib/data/settings.svelte.ts), read live so a
+// change on the Settings page takes effect without a reload.
+import { settings } from '#lib/data/settings.svelte.js';
 
 /**
  * Svelte action: calls `onRead(dwellMs)` once, when the node stops being the
- * active (>60% visible) card, but only if it was active past DWELL_MS.
+ * active (>60% visible) card, but only if it was active past the current
+ * dwell threshold.
  */
 export function dwellTracker(node: HTMLElement, onRead: (dwellMs: number) => void) {
 	let enteredAt: number | undefined;
@@ -18,7 +21,7 @@ export function dwellTracker(node: HTMLElement, onRead: (dwellMs: number) => voi
 			if (enteredAt === undefined) return;
 			const dwellMs = performance.now() - enteredAt;
 			enteredAt = undefined;
-			if (dwellMs >= DWELL_MS) onRead(dwellMs);
+			if (dwellMs >= settings.dwellMs) onRead(dwellMs);
 		},
 		{ threshold: [0, 0.6] }
 	);

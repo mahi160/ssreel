@@ -2,8 +2,10 @@
 	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
-	import { IconList, IconRefresh } from '@tabler/icons-svelte';
+	import { IconList, IconRefresh, IconSettings } from '@tabler/icons-svelte';
 	import { sync } from '#lib/data/sync.js';
+	import { isMuted } from '#lib/data/mute.js';
+	import { settings } from '#lib/data/settings.svelte.js';
 	import {
 		unreadArticles,
 		getArticle,
@@ -19,6 +21,10 @@
 
 	let articles = $state<StoredArticle[]>([]);
 	let reelKey = $state(0); // bumped to remount Reel, resetting scroll to the top article
+
+	// Muting is display-only: `articles` always holds every unread article on
+	// the device, so unmuting reveals matches instantly with no reload or refetch.
+	const visibleArticles = $derived(articles.filter((a) => !isMuted(a, settings)));
 
 	async function load() {
 		articles = await unreadArticles();
@@ -108,12 +114,15 @@
 	<Button variant="ghost" size="icon" href="/list" aria-label="List">
 		<IconList />
 	</Button>
+	<Button variant="ghost" size="icon" href="/settings" aria-label="Settings">
+		<IconSettings />
+	</Button>
 </div>
 
-{#if articles.length > 0}
+{#if visibleArticles.length > 0}
 	{#key reelKey}
 		<Reel
-			{articles}
+			articles={visibleArticles}
 			onRead={(id) => (articles = articles.filter((a) => a.id !== id))}
 			onHide={handleHide}
 		/>

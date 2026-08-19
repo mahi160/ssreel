@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { IconArrowLeft } from '@tabler/icons-svelte';
 	import { allArticles, unhideArticle, type ReadState, type StoredArticle } from '#lib/data/db.js';
+	import { isMuted } from '#lib/data/mute.js';
+	import { settings } from '#lib/data/settings.svelte.js';
 	import { Button } from '@/ui/button/index.js';
 	import * as Tabs from '@/ui/tabs/index.js';
 	import { cn } from '@/utils.js';
@@ -15,6 +17,7 @@
 
 	const filtered = $derived(
 		articles
+			.filter((a) => !isMuted(a, settings))
 			.filter((a) => filter === 'all' || a.state === filter)
 			.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 	);
