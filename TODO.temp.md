@@ -3,7 +3,7 @@
 - [x] 1. Tracer: one source end to end
 - [x] 2. Continuous deploy to Cloudflare Pages
 - [x] 3. Full collector: all sources, bodies, dedupe, sections
-- [ ] 4. The reel: swipe paging and dwell-read
+- [x] 4. The reel: swipe paging and dwell-read
 - [ ] 5. Images resized and served from our own origin
 - [ ] 6. Expand, hide, and undo
 - [ ] 7. Sync, window pruning, and the caught-up state

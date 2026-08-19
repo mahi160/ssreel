@@ -14,6 +14,8 @@ export interface Article {
 	source: string;
 	publishedAt: string; // ISO 8601
 	runId: string;
+	/** Position within its run, most important first (ADR — Weight). */
+	rank: number;
 }
 
 export interface Run {

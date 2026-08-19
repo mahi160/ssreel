@@ -20,7 +20,8 @@ function article(source: string, headline: string): Article {
 		url: `https://example.com/${source}/${headline}`,
 		source,
 		publishedAt: new Date().toISOString(),
-		runId: 'run-1'
+		runId: 'run-1',
+		rank: 0
 	};
 }
 

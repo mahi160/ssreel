@@ -46,7 +46,8 @@ async function collectSource(source: Source, runId: string): Promise<Article[]> 
 					url: item.link!,
 					source: source.name,
 					publishedAt: item.isoDate ?? new Date().toISOString(),
-					runId
+					runId,
+					rank: 0 // overwritten once the run's final weight order is known
 				};
 			} catch {
 				return undefined;
@@ -78,7 +79,7 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 
 	const seen = await loadSeenIds();
 	articles = articles.filter((a) => !seen.has(a.id));
-	articles = orderByWeight(articles, sources);
+	articles = orderByWeight(articles, sources).map((a, rank) => ({ ...a, rank }));
 
 	const run: Run = { id: runId, generatedAt: new Date().toISOString(), articles };
 

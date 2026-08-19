@@ -29,6 +29,12 @@ export function getDb() {
 	return dbPromise;
 }
 
+/** Test-only: drops the cached connection so a fresh database can be opened. */
+export async function _resetDbForTests(): Promise<void> {
+	(await dbPromise)?.close();
+	dbPromise = undefined;
+}
+
 /** Run ids already stored on this device. */
 export async function syncedRunIds(): Promise<Set<string>> {
 	const db = await getDb();
@@ -52,4 +58,25 @@ export async function storeRun(runId: string, articles: Article[]): Promise<void
 export async function allArticles(): Promise<StoredArticle[]> {
 	const db = await getDb();
 	return db.getAll('articles');
+}
+
+/** Unread articles, newest run first and by weight within a run. */
+export async function unreadArticles(): Promise<StoredArticle[]> {
+	const articles = await allArticles();
+	return articles
+		.filter((a) => a.state === 'unread')
+		.sort((a, b) => b.runId.localeCompare(a.runId) || a.rank - b.rank);
+}
+
+/** Marks an article read and records how long the reader dwelt on it (ADR-0008). */
+export async function markRead(id: string, dwellMs: number): Promise<void> {
+	const db = await getDb();
+	const article = await db.get('articles', id);
+	if (!article) return;
+	await db.put('articles', {
+		...article,
+		state: 'read',
+		stateChangedAt: new Date().toISOString(),
+		dwellMs
+	});
 }
