@@ -6,7 +6,7 @@
 - [x] 4. The reel: swipe paging and dwell-read
 - [x] 5. Images resized and served from our own origin
 - [x] 6. Expand, hide, and undo
-- [ ] 7. Sync, window pruning, and the caught-up state
+- [x] 7. Sync, window pruning, and the caught-up state
 - [ ] 8. Published RSS feed with full text for e-ink
 - [ ] 9. List view with unread, read and hidden filters
 - [ ] 10. Settings: mute, storage, and reading options

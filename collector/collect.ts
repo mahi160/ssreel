@@ -22,6 +22,18 @@ function trimToExcerpt(text: string): string {
 	return text.length <= MAX_EXCERPT_CHARS ? text : text.slice(0, MAX_EXCERPT_CHARS) + '\u2026';
 }
 
+/**
+ * Keeps the first occurrence of each article id. The same story can be
+ * syndicated under more than one of an outlet's own feeds (e.g. BBC News and
+ * BBC Sport sharing a URL) — without this, a run can carry the same id
+ * twice, which breaks any consumer that keys on it (e.g. Svelte's keyed
+ * `{#each}`).
+ */
+export function dedupeById(articles: Article[]): Article[] {
+	const seen = new Set<string>();
+	return articles.filter((a) => (seen.has(a.id) ? false : seen.add(a.id)));
+}
+
 async function collectSource(source: Source, runId: string): Promise<Article[]> {
 	const feed = await parser.parseURL(source.feedUrl);
 
@@ -80,6 +92,7 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 		// One outlet failing, timing out or erroring must not fail the run.
 		else console.error(`collector: ${sources[i].name} failed:`, result.reason);
 	}
+	articles = dedupeById(articles);
 
 	const seen = await loadSeenIds();
 	articles = articles.filter((a) => !seen.has(a.id));
