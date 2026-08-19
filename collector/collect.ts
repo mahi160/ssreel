@@ -9,6 +9,7 @@ import { processImage } from './image.ts';
 import { classifySection } from './section.ts';
 import { loadSeenIds, saveSeenIds } from './dedupe.ts';
 import { orderByWeight } from './weight.ts';
+import { publishFeed } from './feed.ts';
 import { SOURCES, type Source } from './sources.ts';
 import type { Article, Index, Run } from '../src/lib/data/schema.ts';
 
@@ -115,6 +116,8 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 	// (ADR-0007), not data loss.
 	for (const a of articles) seen.add(a.id);
 	await saveSeenIds(seen);
+
+	await publishFeed();
 
 	return run;
 }

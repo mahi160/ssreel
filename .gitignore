@@ -9,9 +9,10 @@ node_modules
 /build
 /worker-configuration.d.ts
 
-# Collected data and images (build-time artifacts, ADR-0002/0004/0005)
+# Collected data, images and feed (build-time artifacts, ADR-0002/0004/0005)
 /static/data
 /static/images
+/static/feed.xml
 
 # OS
 .DS_Store
