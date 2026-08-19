@@ -1,6 +1,6 @@
 # Implementation tracker — all 13 tickets, in dependency order
 
-- [ ] 1. Tracer: one source end to end
+- [x] 1. Tracer: one source end to end
 - [ ] 2. Continuous deploy to Cloudflare Pages
 - [ ] 3. Full collector: all sources, bodies, dedupe, sections
 - [ ] 4. The reel: swipe paging and dwell-read
