@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
 	import { IconList, IconRefresh, IconSettings } from '@tabler/icons-svelte';
@@ -17,6 +16,8 @@
 	import type { Run } from '#lib/data/schema.js';
 	import { nextRunAt, formatCountdown } from '#lib/data/schedule.js';
 	import Reel from '#lib/reel/Reel.svelte';
+	import DesktopPane from '#lib/reel/DesktopPane.svelte';
+	import { viewport } from '#lib/reel/viewport.svelte.js';
 	import { Button } from '@/ui/button/index.js';
 
 	let articles = $state<StoredArticle[]>([]);
@@ -25,6 +26,25 @@
 	// Muting is display-only: `articles` always holds every unread article on
 	// the device, so unmuting reveals matches instantly with no reload or refetch.
 	const visibleArticles = $derived(articles.filter((a) => !isMuted(a, settings)));
+
+	// The article currently being read, shared between the mobile reel and the
+	// desktop pane so resizing across the breakpoint never loses the reader's
+	// place — both layouts stay mounted (toggled with CSS, see the markup
+	// below), and this is their one shared source of truth.
+	let currentId = $state<string>();
+	$effect(() => {
+		if (currentId === undefined && visibleArticles.length > 0) currentId = visibleArticles[0].id;
+	});
+	// Keeps the mobile reel scrolled to whatever the desktop pane selected, so
+	// switching back to it lands on the same article. Gated on !isDesktop:
+	// scrollIntoView is a no-op on a display:none element, so this has to wait
+	// until the reel actually becomes visible again, not just fire whenever
+	// currentId changes (which can happen while the reel is still hidden).
+	$effect(() => {
+		const id = currentId;
+		if (!id || viewport.isDesktop) return;
+		document.querySelector(`[data-article-id="${id}"]`)?.scrollIntoView({ behavior: 'instant' });
+	});
 
 	async function load() {
 		articles = await unreadArticles();
@@ -40,8 +60,7 @@
 				const article = await getArticle(id);
 				if (article) articles = [...articles, article].sort(byRunThenRank);
 			}
-			await tick();
-			document.querySelector(`[data-article-id="${id}"]`)?.scrollIntoView({ behavior: 'instant' });
+			currentId = id; // triggers the scroll-into-view effect below, once the DOM has the card
 		} catch (err) {
 			console.error('focusFromList failed:', err);
 		}
@@ -120,13 +139,23 @@
 </div>
 
 {#if visibleArticles.length > 0}
-	{#key reelKey}
-		<Reel
-			articles={visibleArticles}
-			onRead={(id) => (articles = articles.filter((a) => a.id !== id))}
-			onHide={handleHide}
-		/>
-	{/key}
+	<div class="lg:hidden">
+		{#key reelKey}
+			<Reel
+				articles={visibleArticles}
+				onActive={(id) => (currentId = id)}
+				onRead={(id) => (articles = articles.filter((a) => a.id !== id))}
+				onHide={handleHide}
+			/>
+		{/key}
+	</div>
+	<DesktopPane
+		articles={visibleArticles}
+		{currentId}
+		onSelect={(id) => (currentId = id)}
+		onRead={(id) => (articles = articles.filter((a) => a.id !== id))}
+		onHide={handleHide}
+	/>
 {:else}
 	{@const nextRun = nextRunAt()}
 	<div class="flex h-dvh w-full flex-col items-center justify-center gap-1 p-4 text-center">

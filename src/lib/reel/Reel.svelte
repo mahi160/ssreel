@@ -5,10 +5,15 @@
 
 	let {
 		articles,
+		onActive,
 		onRead,
 		onHide
-	}: { articles: StoredArticle[]; onRead: (id: string) => void; onHide: (id: string) => void } =
-		$props();
+	}: {
+		articles: StoredArticle[];
+		onActive?: (id: string) => void;
+		onRead: (id: string) => void;
+		onHide: (id: string) => void;
+	} = $props();
 
 	function read(id: string, dwellMs: number) {
 		// A hide's synchronous removal from `articles` always lands before this
@@ -24,6 +29,7 @@
 	{#each articles as article (article.id)}
 		<ArticleCard
 			{article}
+			onActive={() => onActive?.(article.id)}
 			onRead={(dwellMs) => read(article.id, dwellMs)}
 			onHide={() => onHide(article.id)}
 		/>
