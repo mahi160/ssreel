@@ -1,0 +1,17 @@
+# Implementation tracker — all 13 tickets, in dependency order
+
+- [ ] 1. Tracer: one source end to end
+- [ ] 2. Continuous deploy to Cloudflare Pages
+- [ ] 3. Full collector: all sources, bodies, dedupe, sections
+- [ ] 4. The reel: swipe paging and dwell-read
+- [ ] 5. Images resized and served from our own origin
+- [ ] 6. Expand, hide, and undo
+- [ ] 7. Sync, window pruning, and the caught-up state
+- [ ] 8. Published RSS feed with full text for e-ink
+- [ ] 9. List view with unread, read and hidden filters
+- [ ] 10. Settings: mute, storage, and reading options
+- [ ] 11. Desktop two-pane layout and keyboard navigation
+- [ ] 12. PWA: installable, offline, and never stale
+- [ ] 13. Scheduled pipeline with durable image storage
+
+Each ticket: implement -> typecheck -> test -> review -> commit.

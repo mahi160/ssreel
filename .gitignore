@@ -7,6 +7,10 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+/worker-configuration.d.ts
+
+# Collected data (build-time artifact, ADR-0002/0004)
+/static/data
 
 # OS
 .DS_Store
