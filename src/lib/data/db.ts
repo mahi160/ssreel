@@ -70,13 +70,26 @@ export async function unreadArticles(): Promise<StoredArticle[]> {
 
 /** Marks an article read and records how long the reader dwelt on it (ADR-0008). */
 export async function markRead(id: string, dwellMs: number): Promise<void> {
+	await setState(id, 'read', { dwellMs });
+}
+
+/** Dismisses an article so it never returns to the reel — still kept on the device. */
+export async function hideArticle(id: string): Promise<void> {
+	await setState(id, 'hidden');
+}
+
+/** Undoes a hide, restoring the article to the reel at its original position. */
+export async function unhideArticle(id: string): Promise<void> {
+	await setState(id, 'unread');
+}
+
+async function setState(
+	id: string,
+	state: ReadState,
+	extra: Partial<StoredArticle> = {}
+): Promise<void> {
 	const db = await getDb();
 	const article = await db.get('articles', id);
 	if (!article) return;
-	await db.put('articles', {
-		...article,
-		state: 'read',
-		stateChangedAt: new Date().toISOString(),
-		dwellMs
-	});
+	await db.put('articles', { ...article, ...extra, state, stateChangedAt: new Date().toISOString() });
 }
