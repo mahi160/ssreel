@@ -17,6 +17,7 @@
 
 <div
 	class="flex h-dvh w-full snap-start snap-always items-center justify-center p-4"
+	data-article-id={article.id}
 	use:dwellTracker={onRead}
 	use:cardGestures={{ onTap: () => (expanded = !expanded), onHide }}
 >

@@ -1,9 +1,12 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { IconRefresh } from '@tabler/icons-svelte';
+	import { page } from '$app/state';
+	import { IconList, IconRefresh } from '@tabler/icons-svelte';
 	import { sync } from '#lib/data/sync.js';
 	import {
 		unreadArticles,
+		getArticle,
 		hideArticle,
 		unhideArticle,
 		byRunThenRank,
@@ -19,6 +22,23 @@
 
 	async function load() {
 		articles = await unreadArticles();
+	}
+
+	// The list can send the reader to a specific article — including a read or
+	// hidden one the reel wouldn't otherwise show — via ?focus=<id>.
+	async function focusFromList() {
+		const id = page.url.searchParams.get('focus');
+		if (!id) return;
+		try {
+			if (!articles.some((a) => a.id === id)) {
+				const article = await getArticle(id);
+				if (article) articles = [...articles, article].sort(byRunThenRank);
+			}
+			await tick();
+			document.querySelector(`[data-article-id="${id}"]`)?.scrollIntoView({ behavior: 'instant' });
+		} catch (err) {
+			console.error('focusFromList failed:', err);
+		}
 	}
 
 	// Adds a freshly-synced run's articles without re-deriving the whole list from
@@ -43,7 +63,9 @@
 	$effect(() => {
 		// Show whatever's already on the device first, then sync — best-effort, so
 		// an offline device just keeps reading what it already has.
-		load().then(() => sync(appendRun).catch(() => {}));
+		load()
+			.then(focusFromList)
+			.then(() => sync(appendRun).catch(() => {}));
 	});
 
 	async function refresh() {
@@ -79,15 +101,14 @@
 	}
 </script>
 
-<Button
-	variant="ghost"
-	size="icon"
-	class="absolute top-4 right-4 z-10"
-	aria-label="Refresh"
-	onclick={refresh}
->
-	<IconRefresh />
-</Button>
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+	<Button variant="ghost" size="icon" aria-label="Refresh" onclick={refresh}>
+		<IconRefresh />
+	</Button>
+	<Button variant="ghost" size="icon" href="/list" aria-label="List">
+		<IconList />
+	</Button>
+</div>
 
 {#if articles.length > 0}
 	{#key reelKey}

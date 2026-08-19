@@ -84,6 +84,11 @@ export async function allArticles(): Promise<StoredArticle[]> {
 	return db.getAll('articles');
 }
 
+export async function getArticle(id: string): Promise<StoredArticle | undefined> {
+	const db = await getDb();
+	return db.get('articles', id);
+}
+
 /** Newest run first, by weight-rank within a run. */
 export function byRunThenRank(a: Article, b: Article): number {
 	return b.runId.localeCompare(a.runId) || a.rank - b.rank;
@@ -116,12 +121,12 @@ async function setState(
 	extra: Partial<StoredArticle> = {}
 ): Promise<void> {
 	const db = await getDb();
-	const article = await db.get('articles', id);
-	if (!article) return;
-	await db.put('articles', {
-		...article,
-		...extra,
-		state,
-		stateChangedAt: new Date().toISOString()
-	});
+	// One transaction for the read-modify-write, so a concurrent state change
+	// for the same article can't interleave between the get and the put.
+	const tx = db.transaction('articles', 'readwrite');
+	const article = await tx.store.get(id);
+	if (article) {
+		await tx.store.put({ ...article, ...extra, state, stateChangedAt: new Date().toISOString() });
+	}
+	await tx.done;
 }

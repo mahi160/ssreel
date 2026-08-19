@@ -8,7 +8,7 @@
 - [x] 6. Expand, hide, and undo
 - [x] 7. Sync, window pruning, and the caught-up state
 - [x] 8. Published RSS feed with full text for e-ink
-- [ ] 9. List view with unread, read and hidden filters
+- [x] 9. List view with unread, read and hidden filters
 - [ ] 10. Settings: mute, storage, and reading options
 - [ ] 11. Desktop two-pane layout and keyboard navigation
 - [ ] 12. PWA: installable, offline, and never stale

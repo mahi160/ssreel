@@ -11,6 +11,10 @@
 		$props();
 
 	function read(id: string, dwellMs: number) {
+		// A hide's synchronous removal from `articles` always lands before this
+		// (async, DOM-removal-triggered) callback fires — if it's already gone,
+		// the article was hidden mid-dwell, and hide should win over the read.
+		if (!articles.some((a) => a.id === id)) return;
 		onRead(id); // instant: the card is already scrolled past
 		markRead(id, dwellMs).catch((err) => console.error('markRead failed:', err));
 	}
