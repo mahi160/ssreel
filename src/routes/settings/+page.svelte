@@ -62,7 +62,7 @@
 					Desk controls
 				</p>
 				<h1
-					class="mt-2 font-heading text-5xl leading-none font-black tracking-[-0.06em] sm:text-7xl"
+					class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em] sm:text-4xl"
 				>
 					Tune feed
 				</h1>
@@ -80,7 +80,7 @@
 					<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
 						Sections
 					</p>
-					<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">
+					<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
 						Keep on desk
 					</h2>
 				</div>
@@ -108,7 +108,7 @@
 		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
 			<div class="mb-4 border-b pb-4">
 				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Reading</p>
-				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Pass speed</h2>
+				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">Pass speed</h2>
 			</div>
 
 			<div class="grid gap-3 rounded-2xl border bg-card/75 p-4">
@@ -178,7 +178,7 @@
 		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
 			<div class="mb-4 border-b pb-4">
 				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sources</p>
-				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">
+				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
 					Open channels
 				</h2>
 			</div>
