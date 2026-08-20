@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { IconArrowLeft } from '@tabler/icons-svelte';
 	import { allArticles, clearAllArticles } from '#lib/data/db.js';
-	import { SECTIONS } from '#lib/data/schema.js';
+	import { LANGUAGE_LABEL, SECTIONS, SECTION_ACCENT, type LanguageFilter } from '#lib/data/schema.js';
 	import {
 		settings,
 		toggleMutedSection,
 		toggleMutedSource,
-		setDwellMs
+		setDwellMs,
+		setDarkMode,
+		setLanguageFilter,
+		type DarkMode
 	} from '#lib/data/settings.svelte.js';
 	import { Button } from '@/ui/button/index.js';
 	import { Switch } from '@/ui/switch/index.js';
@@ -16,10 +19,9 @@
 	let sources = $state<string[]>([]);
 	let articleCount = $state(0);
 	let storageBytes = $state<number | undefined>();
-
-	// Guards against an in-flight load overwriting the result of a later one
-	// (e.g. the initial load resolving after a Clear has already refreshed it).
 	let loadGeneration = 0;
+	const darkModes: DarkMode[] = ['system', 'light', 'dark'];
+	const languageFilters: LanguageFilter[] = ['mixed', 'en', 'bn'];
 
 	async function loadStorageInfo() {
 		const generation = ++loadGeneration;
@@ -31,7 +33,7 @@
 		storageBytes = usage;
 	}
 	$effect(() => {
-		loadStorageInfo(); // IndexedDB only exists in the browser — must not run during SSR
+		void loadStorageInfo();
 	});
 
 	function formatBytes(bytes: number): string {
@@ -47,68 +49,125 @@
 	}
 </script>
 
-<div class="mx-auto flex h-dvh max-w-2xl flex-col gap-8 overflow-y-auto p-4">
-	<div class="flex items-center gap-2">
-		<Button variant="ghost" size="icon" href="/" aria-label="Back to reel">
-			<IconArrowLeft />
-		</Button>
-		<h1 class="text-lg font-semibold">Settings</h1>
-	</div>
-
-	<section class="flex flex-col gap-3">
-		<h2 class="text-sm font-semibold text-muted-foreground">Sections</h2>
-		{#each SECTIONS as section (section)}
-			<div class="flex items-center justify-between gap-4">
-				<Label for="section-{section}">{section}</Label>
-				<Switch
-					id="section-{section}"
-					checked={!settings.mutedSections.includes(section)}
-					onCheckedChange={() => toggleMutedSection(section)}
-				/>
+<div class="mx-auto flex h-dvh w-full max-w-5xl flex-col gap-4 overflow-y-auto p-4 pb-8 sm:p-6">
+	<header class="press-card border bg-card p-4 sm:p-5">
+		<div class="flex items-start justify-between gap-4">
+			<div>
+				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Desk controls</p>
+				<h1 class="mt-2 font-heading text-5xl leading-none font-black tracking-[-0.06em] sm:text-7xl">Tune feed</h1>
 			</div>
-		{/each}
-	</section>
+			<Button variant="ghost" size="icon" href="/" aria-label="Back to reel" class="rounded-full">
+				<IconArrowLeft />
+			</Button>
+		</div>
+	</header>
 
-	{#if sources.length > 0}
-		<section class="flex flex-col gap-3">
-			<h2 class="text-sm font-semibold text-muted-foreground">Sources</h2>
-			{#each sources as source (source)}
+	<div class="grid gap-4 lg:grid-cols-[1fr_1fr]">
+		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+			<div class="mb-4 flex items-end justify-between gap-4 border-b pb-4">
+				<div>
+					<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sections</p>
+					<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Keep on desk</h2>
+				</div>
+			</div>
+			<div class="grid gap-2">
+				{#each SECTIONS as section (section)}
+					<div style={`--accent:${SECTION_ACCENT[section]}`} class="grid grid-cols-[0.75rem_1fr_auto] items-center gap-3 rounded-2xl border bg-card/75 p-3">
+						<span class="h-full min-h-9 rounded-full bg-[var(--accent)]" aria-hidden="true"></span>
+						<Label for="section-{section}" class="normal-case tracking-normal">
+							<span>{section}</span>
+						</Label>
+						<Switch
+							id="section-{section}"
+							checked={!settings.mutedSections.includes(section)}
+							onCheckedChange={() => toggleMutedSection(section)}
+						/>
+					</div>
+				{/each}
+			</div>
+		</section>
+
+		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+			<div class="mb-4 border-b pb-4">
+				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Reading</p>
+				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Pass speed</h2>
+			</div>
+
+			<div class="grid gap-3 rounded-2xl border bg-card/75 p-4">
+				<p class="text-xs font-bold tracking-[0.24em] text-muted-foreground uppercase">Theme</p>
+				<div class="flex flex-wrap gap-2">
+					{#each darkModes as mode (mode)}
+						<Button
+							size="sm"
+							variant={settings.darkMode === mode ? 'default' : 'outline'}
+							onclick={() => setDarkMode(mode)}
+						>
+							{mode}
+						</Button>
+					{/each}
+				</div>
+			</div>
+
+			<div class="mt-4 grid gap-3 rounded-2xl border bg-card/75 p-4">
+				<p class="text-xs font-bold tracking-[0.24em] text-muted-foreground uppercase">Language</p>
+				<div class="flex flex-wrap gap-2">
+					{#each languageFilters as languageFilter (languageFilter)}
+						<Button
+							size="sm"
+							variant={settings.languageFilter === languageFilter ? 'default' : 'outline'}
+							onclick={() => setLanguageFilter(languageFilter)}
+						>
+							{LANGUAGE_LABEL[languageFilter]}
+						</Button>
+					{/each}
+				</div>
+			</div>
+
+			<div class="mt-4 grid gap-4 rounded-2xl border bg-card/75 p-4">
 				<div class="flex items-center justify-between gap-4">
-					<Label for="source-{source}">{source}</Label>
-					<Switch
-						id="source-{source}"
-						checked={!settings.mutedSources.includes(source)}
-						onCheckedChange={() => toggleMutedSource(source)}
+					<Label for="dwell" class="normal-case tracking-normal">Seconds before article is read</Label>
+					<Input
+						id="dwell"
+						type="number"
+						min="1"
+						class="w-20 text-center"
+						value={settings.dwellMs / 1000}
+						onchange={(e) => setDwellMs(e.currentTarget.valueAsNumber * 1000)}
 					/>
 				</div>
-			{/each}
+				<p class="text-sm leading-relaxed text-muted-foreground">Fast skim? Lower it. Deep read? Raise it. Swipe still hides instantly.</p>
+			</div>
+
+			<div class="mt-4 rounded-2xl border bg-card/75 p-4">
+				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Storage</p>
+				<p class="mt-2 text-sm text-muted-foreground">
+					{articleCount} article{articleCount === 1 ? '' : 's'} stored{storageBytes !== undefined
+						? ` · ${formatBytes(storageBytes)} used`
+						: ''}
+				</p>
+				<Button variant="destructive" class="mt-4" onclick={clearStorage}>Clear stored articles</Button>
+			</div>
+		</section>
+	</div>
+
+	{#if sources.length > 0}
+		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+			<div class="mb-4 border-b pb-4">
+				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sources</p>
+				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Open channels</h2>
+			</div>
+			<div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+				{#each sources as source (source)}
+					<div class="flex items-center justify-between gap-4 rounded-2xl border bg-card/75 p-3">
+						<Label for="source-{source}" class="truncate normal-case tracking-normal">{source}</Label>
+						<Switch
+							id="source-{source}"
+							checked={!settings.mutedSources.includes(source)}
+							onCheckedChange={() => toggleMutedSource(source)}
+						/>
+					</div>
+				{/each}
+			</div>
 		</section>
 	{/if}
-
-	<section class="flex flex-col gap-3">
-		<h2 class="text-sm font-semibold text-muted-foreground">Reading</h2>
-		<div class="flex items-center justify-between gap-4">
-			<Label for="dwell">Dwell threshold (seconds)</Label>
-			<Input
-				id="dwell"
-				type="number"
-				min="1"
-				class="w-20"
-				value={settings.dwellMs / 1000}
-				onchange={(e) => setDwellMs(e.currentTarget.valueAsNumber * 1000)}
-			/>
-		</div>
-	</section>
-
-	<section class="flex flex-col gap-3">
-		<h2 class="text-sm font-semibold text-muted-foreground">Storage</h2>
-		<p class="text-sm text-muted-foreground">
-			{articleCount} article{articleCount === 1 ? '' : 's'} stored{storageBytes !== undefined
-				? ` · ${formatBytes(storageBytes)} used`
-				: ''}
-		</p>
-		<Button variant="destructive" class="self-start" onclick={clearStorage}>
-			Clear stored articles
-		</Button>
-	</section>
 </div>

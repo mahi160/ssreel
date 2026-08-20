@@ -49,7 +49,11 @@
 	$effect(() => {
 		const id = currentId;
 		if (!id || viewport.isDesktop) return;
-		document.querySelector(`[data-article-id="${id}"]`)?.scrollIntoView({ behavior: 'instant' });
+		for (const el of document.querySelectorAll<HTMLElement>('[data-article-id]')) {
+			if (el.dataset.articleId !== id) continue;
+			el.scrollIntoView({ behavior: 'instant' });
+			break;
+		}
 	});
 
 	async function load() {
@@ -134,14 +138,14 @@
 	}
 </script>
 
-<div class="absolute top-4 right-4 z-10 flex gap-2">
-	<Button variant="ghost" size="icon" aria-label="Refresh" onclick={refresh}>
+<div class="fixed inset-x-0 bottom-3 z-20 mx-auto flex w-fit items-center gap-1 rounded-full border bg-[var(--press-glass)] p-1 shadow-[0_18px_50px_color-mix(in_oklch,var(--foreground)_18%,transparent)] backdrop-blur-xl lg:top-4 lg:right-4 lg:bottom-auto lg:left-auto lg:mx-0">
+	<Button variant="ghost" size="icon" aria-label="Refresh editions" onclick={refresh} class="rounded-full">
 		<IconRefresh />
 	</Button>
-	<Button variant="ghost" size="icon" href="/list" aria-label="List">
+	<Button variant="ghost" size="icon" href="/list" aria-label="Open article ledger" class="rounded-full">
 		<IconList />
 	</Button>
-	<Button variant="ghost" size="icon" href="/settings" aria-label="Settings">
+	<Button variant="ghost" size="icon" href="/settings" aria-label="Tune sources" class="rounded-full">
 		<IconSettings />
 	</Button>
 </div>
@@ -166,18 +170,26 @@
 	/>
 {:else if hasSyncedEver}
 	{@const nextRun = nextRunAt()}
-	<div class="flex h-dvh w-full flex-col items-center justify-center gap-1 p-4 text-center">
-		<p class="text-lg">You're caught up.</p>
-		<p class="text-muted-foreground">
-			Next edition at {nextRun.toLocaleTimeString(undefined, {
-				hour: 'numeric',
-				minute: '2-digit'
-			})} ({formatCountdown(nextRun)})
-		</p>
+	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
+		<div class="press-card scanline max-w-sm border bg-card p-8">
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Wire quiet</p>
+			<p class="font-heading text-4xl leading-none font-black tracking-tight">Caught up.</p>
+			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+				Next edition drops at {nextRun.toLocaleTimeString(undefined, {
+					hour: 'numeric',
+					minute: '2-digit'
+				})}. {formatCountdown(nextRun)}.
+			</p>
+		</div>
 	</div>
 {:else}
-	<div class="flex h-dvh w-full flex-col items-center justify-center gap-1 p-4 text-center">
-		<p class="text-lg">No articles yet.</p>
-		<p class="text-muted-foreground">Connect to the internet to get today's edition.</p>
+	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
+		<div class="press-card max-w-sm border bg-card p-8">
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">No cache</p>
+			<p class="font-heading text-4xl leading-none font-black tracking-tight">No articles yet.</p>
+			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+				Connect to the internet to load today's first edition.
+			</p>
+		</div>
 	</div>
 {/if}
