@@ -3,7 +3,7 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import favicon from '#lib/assets/favicon.svg';
 	import { settings } from '#lib/data/settings.svelte.js';
-	import { Toaster } from '@/ui/sonner/index.js';
+	import { Toaster } from '#lib/ui/sonner/index.js';
 
 	let { children } = $props();
 

@@ -19,33 +19,18 @@
 	import Reel from '#lib/reel/Reel.svelte';
 	import DesktopPane from '#lib/reel/DesktopPane.svelte';
 	import { viewport } from '#lib/reel/viewport.svelte.js';
-	import { Button } from '@/ui/button/index.js';
+	import { Button } from '#lib/ui/button/index.js';
 
 	let articles = $state<StoredArticle[]>([]);
-	let reelKey = $state(0); // bumped to remount Reel, resetting scroll to the top article
-	// Distinguishes a genuine "caught up" (has synced before, nothing left
-	// unread) from a fresh install that's never reached the network — the
-	// latter needs an explanation, not a countdown to an edition it can't
-	// promise exists.
+	let reelKey = $state(0);
 	let hasSyncedEver = $state(true);
 
-	// Muting is display-only: `articles` always holds every unread article on
-	// the device, so unmuting reveals matches instantly with no reload or refetch.
 	const visibleArticles = $derived(articles.filter((a) => !isMuted(a, settings)));
 
-	// The article currently being read, shared between the mobile reel and the
-	// desktop pane so resizing across the breakpoint never loses the reader's
-	// place — both layouts stay mounted (toggled with CSS, see the markup
-	// below), and this is their one shared source of truth.
 	let currentId = $state<string>();
 	$effect(() => {
 		if (currentId === undefined && visibleArticles.length > 0) currentId = visibleArticles[0].id;
 	});
-	// Keeps the mobile reel scrolled to whatever the desktop pane selected, so
-	// switching back to it lands on the same article. Gated on !isDesktop:
-	// scrollIntoView is a no-op on a display:none element, so this has to wait
-	// until the reel actually becomes visible again, not just fire whenever
-	// currentId changes (which can happen while the reel is still hidden).
 	$effect(() => {
 		const id = currentId;
 		if (!id || viewport.isDesktop) return;
@@ -61,8 +46,6 @@
 		hasSyncedEver = (await syncedRunIds()).size > 0;
 	}
 
-	// The list can send the reader to a specific article — including a read or
-	// hidden one the reel wouldn't otherwise show — via ?focus=<id>.
 	async function focusFromList() {
 		const id = page.url.searchParams.get('focus');
 		if (!id) return;
@@ -138,14 +121,42 @@
 	}
 </script>
 
-<div class="fixed inset-x-0 bottom-3 z-20 mx-auto flex w-fit items-center gap-1 rounded-full border bg-[var(--press-glass)] p-1 shadow-[0_18px_50px_color-mix(in_oklch,var(--foreground)_18%,transparent)] backdrop-blur-xl lg:top-4 lg:right-4 lg:bottom-auto lg:left-auto lg:mx-0">
-	<Button variant="ghost" size="icon" aria-label="Refresh editions" onclick={refresh} class="rounded-full">
+<div
+	class="fixed top-[17vh] left-3 z-20 flex -translate-y-1/2 flex-col items-center gap-1 rounded-full border bg-(--press-glass) p-1 shadow-[0_18px_50px_color-mix(in_oklch,var(--foreground)_18%,transparent)] backdrop-blur-xl lg:top-4 lg:right-4 lg:left-auto lg:translate-y-0 lg:flex-row"
+>
+	<Button
+		variant="ghost"
+		size="icon"
+		aria-label="Refresh editions"
+		onclick={refresh}
+		class="rounded-full"
+	>
 		<IconRefresh />
 	</Button>
-	<Button variant="ghost" size="icon" href="/list" aria-label="Open article ledger" class="rounded-full">
+	<Button
+		variant="ghost"
+		size="icon"
+		href="/list"
+		aria-label="Open article ledger"
+		class="relative rounded-full"
+	>
 		<IconList />
+		{#if visibleArticles.length > 0}
+			<!-- Desktop already shows the count in the sidebar header. -->
+			<span
+				class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[0.6rem] font-bold text-[var(--accent-foreground)] lg:hidden"
+			>
+				{visibleArticles.length}
+			</span>
+		{/if}
 	</Button>
-	<Button variant="ghost" size="icon" href="/settings" aria-label="Tune sources" class="rounded-full">
+	<Button
+		variant="ghost"
+		size="icon"
+		href="/settings"
+		aria-label="Tune sources"
+		class="rounded-full"
+	>
 		<IconSettings />
 	</Button>
 </div>
@@ -171,9 +182,13 @@
 {:else if hasSyncedEver}
 	{@const nextRun = nextRunAt()}
 	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
-		<div class="press-card scanline max-w-sm border bg-card p-8">
-			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Wire quiet</p>
-			<p class="font-heading text-4xl leading-none font-black tracking-tight">Caught up.</p>
+		<div class="press-card max-w-sm border bg-card p-8">
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+				Wire quiet
+			</p>
+			<p class="font-heading text-2xl leading-none font-black tracking-tight sm:text-3xl">
+				Caught up.
+			</p>
 			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
 				Next edition drops at {nextRun.toLocaleTimeString(undefined, {
 					hour: 'numeric',
@@ -185,8 +200,12 @@
 {:else}
 	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
 		<div class="press-card max-w-sm border bg-card p-8">
-			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">No cache</p>
-			<p class="font-heading text-4xl leading-none font-black tracking-tight">No articles yet.</p>
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+				No cache
+			</p>
+			<p class="font-heading text-2xl leading-none font-black tracking-tight sm:text-3xl">
+				No articles yet.
+			</p>
 			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
 				Connect to the internet to load today's first edition.
 			</p>

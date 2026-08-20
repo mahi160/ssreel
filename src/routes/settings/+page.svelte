@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { IconArrowLeft } from '@tabler/icons-svelte';
 	import { allArticles, clearAllArticles } from '#lib/data/db.js';
-	import { LANGUAGE_LABEL, SECTIONS, SECTION_ACCENT, type LanguageFilter } from '#lib/data/schema.js';
+	import {
+		LANGUAGE_LABEL,
+		SECTIONS,
+		SECTION_ACCENT,
+		type LanguageFilter
+	} from '#lib/data/schema.js';
 	import {
 		settings,
 		toggleMutedSection,
@@ -11,10 +16,10 @@
 		setLanguageFilter,
 		type DarkMode
 	} from '#lib/data/settings.svelte.js';
-	import { Button } from '@/ui/button/index.js';
-	import { Switch } from '@/ui/switch/index.js';
-	import { Label } from '@/ui/label/index.js';
-	import { Input } from '@/ui/input/index.js';
+	import { Button } from '#lib/ui/button/index.js';
+	import { Switch } from '#lib/ui/switch/index.js';
+	import { Label } from '#lib/ui/label/index.js';
+	import { Input } from '#lib/ui/input/index.js';
 
 	let sources = $state<string[]>([]);
 	let articleCount = $state(0);
@@ -53,8 +58,14 @@
 	<header class="press-card border bg-card p-4 sm:p-5">
 		<div class="flex items-start justify-between gap-4">
 			<div>
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Desk controls</p>
-				<h1 class="mt-2 font-heading text-5xl leading-none font-black tracking-[-0.06em] sm:text-7xl">Tune feed</h1>
+				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+					Desk controls
+				</p>
+				<h1
+					class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em] sm:text-4xl"
+				>
+					Tune feed
+				</h1>
 			</div>
 			<Button variant="ghost" size="icon" href="/" aria-label="Back to reel" class="rounded-full">
 				<IconArrowLeft />
@@ -66,15 +77,22 @@
 		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
 			<div class="mb-4 flex items-end justify-between gap-4 border-b pb-4">
 				<div>
-					<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sections</p>
-					<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Keep on desk</h2>
+					<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+						Sections
+					</p>
+					<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
+						Keep on desk
+					</h2>
 				</div>
 			</div>
 			<div class="grid gap-2">
 				{#each SECTIONS as section (section)}
-					<div style={`--accent:${SECTION_ACCENT[section]}`} class="grid grid-cols-[0.75rem_1fr_auto] items-center gap-3 rounded-2xl border bg-card/75 p-3">
+					<div
+						style={`--accent:${SECTION_ACCENT[section]}`}
+						class="grid grid-cols-[0.75rem_1fr_auto] items-center gap-3 rounded-2xl border bg-card/75 p-3"
+					>
 						<span class="h-full min-h-9 rounded-full bg-[var(--accent)]" aria-hidden="true"></span>
-						<Label for="section-{section}" class="normal-case tracking-normal">
+						<Label for="section-{section}" class="tracking-normal normal-case">
 							<span>{section}</span>
 						</Label>
 						<Switch
@@ -90,7 +108,7 @@
 		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
 			<div class="mb-4 border-b pb-4">
 				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Reading</p>
-				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Pass speed</h2>
+				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">Pass speed</h2>
 			</div>
 
 			<div class="grid gap-3 rounded-2xl border bg-card/75 p-4">
@@ -125,7 +143,9 @@
 
 			<div class="mt-4 grid gap-4 rounded-2xl border bg-card/75 p-4">
 				<div class="flex items-center justify-between gap-4">
-					<Label for="dwell" class="normal-case tracking-normal">Seconds before article is read</Label>
+					<Label for="dwell" class="tracking-normal normal-case"
+						>Seconds before article is read</Label
+					>
 					<Input
 						id="dwell"
 						type="number"
@@ -135,7 +155,9 @@
 						onchange={(e) => setDwellMs(e.currentTarget.valueAsNumber * 1000)}
 					/>
 				</div>
-				<p class="text-sm leading-relaxed text-muted-foreground">Fast skim? Lower it. Deep read? Raise it. Swipe still hides instantly.</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					Fast skim? Lower it. Deep read? Raise it. Swipe still hides instantly.
+				</p>
 			</div>
 
 			<div class="mt-4 rounded-2xl border bg-card/75 p-4">
@@ -145,7 +167,9 @@
 						? ` · ${formatBytes(storageBytes)} used`
 						: ''}
 				</p>
-				<Button variant="destructive" class="mt-4" onclick={clearStorage}>Clear stored articles</Button>
+				<Button variant="destructive" class="mt-4" onclick={clearStorage}
+					>Clear stored articles</Button
+				>
 			</div>
 		</section>
 	</div>
@@ -154,12 +178,16 @@
 		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
 			<div class="mb-4 border-b pb-4">
 				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sources</p>
-				<h2 class="font-heading text-3xl leading-none font-black tracking-[-0.04em]">Open channels</h2>
+				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
+					Open channels
+				</h2>
 			</div>
 			<div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
 				{#each sources as source (source)}
 					<div class="flex items-center justify-between gap-4 rounded-2xl border bg-card/75 p-3">
-						<Label for="source-{source}" class="truncate normal-case tracking-normal">{source}</Label>
+						<Label for="source-{source}" class="truncate tracking-normal normal-case"
+							>{source}</Label
+						>
 						<Switch
 							id="source-{source}"
 							checked={!settings.mutedSources.includes(source)}

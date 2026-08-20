@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+# Collector-written data, rewritten compact on every run — formatting it is
+# pure churn the next run undoes anyway.
+collector/state.json

@@ -136,12 +136,27 @@
 		@apply bg-background text-foreground;
 		min-height: 100dvh;
 		background-image:
-			linear-gradient(115deg, transparent 0 58%, color-mix(in oklch, var(--accent) 9%, transparent) 58% 59%, transparent 59%),
-			radial-gradient(circle at 18% 12%, color-mix(in oklch, var(--chart-2) 12%, transparent), transparent 32%),
-			repeating-linear-gradient(0deg, transparent 0 17px, color-mix(in oklch, var(--foreground) 4%, transparent) 17px 18px);
+			linear-gradient(
+				115deg,
+				transparent 0 58%,
+				color-mix(in oklch, var(--accent) 9%, transparent) 58% 59%,
+				transparent 59%
+			),
+			radial-gradient(
+				circle at 18% 12%,
+				color-mix(in oklch, var(--chart-2) 12%, transparent),
+				transparent 32%
+			),
+			repeating-linear-gradient(
+				0deg,
+				transparent 0 17px,
+				color-mix(in oklch, var(--foreground) 4%, transparent) 17px 18px
+			);
 		-webkit-font-smoothing: antialiased;
 		text-rendering: optimizeLegibility;
-		font-feature-settings: 'kern' 1, 'ss01' 1;
+		font-feature-settings:
+			'kern' 1,
+			'ss01' 1;
 	}
 	::selection {
 		background: var(--accent);
@@ -173,43 +188,5 @@
 			var(--accent) 0 0.8rem,
 			transparent 0.8rem 1.22rem
 		);
-	}
-
-	.press-pass-hole {
-		background: radial-gradient(circle at center, var(--background) 0 44%, transparent 45%);
-	}
-
-	.scanline {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.scanline::after {
-		content: '';
-		position: absolute;
-		inset-inline: -20%;
-		inset-block-start: 0;
-		height: 3px;
-		background: linear-gradient(90deg, transparent, var(--accent), transparent);
-		opacity: 0.72;
-		animation: scan-pass 3.8s ease-in-out infinite;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.scanline::after {
-			animation: none;
-			display: none;
-		}
-	}
-}
-
-@keyframes scan-pass {
-	0%,
-	18% {
-		transform: translateY(-1rem);
-	}
-	72%,
-	100% {
-		transform: translateY(110dvh);
 	}
 }

@@ -25,7 +25,12 @@
 	}
 </script>
 
-<div class="h-dvh w-full snap-y snap-mandatory overflow-y-auto">
+<!-- overscroll-contain here, not on each card's inner text scroll below, so a
+     swipe that runs past the end of a long article's body chains straight
+     into paging to the next card instead of dead-ending; contain sits at
+     this outer boundary only, to stop the browser's own bounce/refresh
+     gesture at the very top/bottom of the whole reel. -->
+<div class="h-dvh w-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
 	{#each articles as article (article.id)}
 		<ArticleCard
 			{article}

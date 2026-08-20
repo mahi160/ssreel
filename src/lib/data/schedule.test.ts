@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCountdown, nextRunAt } from './schedule.ts';
+import { formatCountdown, formatElapsed, nextRunAt } from './schedule.ts';
 
 describe('nextRunAt', () => {
 	it('finds the next slot later the same BD day', () => {
@@ -35,5 +35,26 @@ describe('formatCountdown', () => {
 	it('says "any moment now" once under a minute away', () => {
 		const now = new Date('2026-01-01T00:00:00Z');
 		expect(formatCountdown(new Date('2026-01-01T00:00:10Z'), now)).toBe('any moment now');
+	});
+});
+
+describe('formatElapsed', () => {
+	const now = new Date('2026-01-01T06:00:00Z');
+
+	it('says "just now" under a minute old', () => {
+		expect(formatElapsed(new Date('2026-01-01T05:59:30Z'), now)).toBe('just now');
+	});
+
+	it('formats minutes only under an hour', () => {
+		expect(formatElapsed(new Date('2026-01-01T05:42:00Z'), now)).toBe('18m ago');
+	});
+
+	it('formats hours and minutes', () => {
+		expect(formatElapsed(new Date('2026-01-01T02:36:00Z'), now)).toBe('3h 24m ago');
+	});
+
+	it('returns undefined at or past 24h, for the caller to fall back to a date', () => {
+		expect(formatElapsed(new Date('2025-12-31T06:00:00Z'), now)).toBeUndefined();
+		expect(formatElapsed(new Date('2025-12-30T06:00:00Z'), now)).toBeUndefined();
 	});
 });

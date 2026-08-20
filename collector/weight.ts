@@ -19,15 +19,17 @@ function storyKey(headline: string): string {
 export function orderByWeight(articles: Article[], sources: Source[]): Article[] {
 	const weightBySource = new Map(sources.map((s) => [s.name, s.weight]));
 
+	// Each article's key is computed once here, not re-derived from its
+	// headline on every comparison the sort below makes.
+	const keyByArticle = new Map<Article, string>();
 	const storyWeight = new Map<string, number>();
 	for (const article of articles) {
 		const key = storyKey(article.headline);
+		keyByArticle.set(article, key);
 		const weight = weightBySource.get(article.source) ?? 0;
 		storyWeight.set(key, (storyWeight.get(key) ?? 0) + weight);
 	}
 
-	return [...articles].sort(
-		(a, b) =>
-			(storyWeight.get(storyKey(b.headline)) ?? 0) - (storyWeight.get(storyKey(a.headline)) ?? 0)
-	);
+	const weightOf = (a: Article) => storyWeight.get(keyByArticle.get(a)!) ?? 0;
+	return [...articles].sort((a, b) => weightOf(b) - weightOf(a));
 }

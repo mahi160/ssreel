@@ -4,10 +4,34 @@ import type { Article } from '../src/lib/data/schema.ts';
 import type { Source } from './sources.ts';
 
 const sources: Source[] = [
-	{ name: 'Big', feedUrl: 'https://big.example/feed', weight: 5, defaultSection: 'Local', language: 'en' },
-	{ name: 'Small A', feedUrl: 'https://a.example/feed', weight: 2, defaultSection: 'Local', language: 'en' },
-	{ name: 'Small B', feedUrl: 'https://b.example/feed', weight: 2, defaultSection: 'Local', language: 'en' },
-	{ name: 'Small C', feedUrl: 'https://c.example/feed', weight: 2, defaultSection: 'Local', language: 'en' }
+	{
+		name: 'Big',
+		feedUrl: 'https://big.example/feed',
+		weight: 5,
+		defaultSection: 'Local',
+		language: 'en'
+	},
+	{
+		name: 'Small A',
+		feedUrl: 'https://a.example/feed',
+		weight: 2,
+		defaultSection: 'Local',
+		language: 'en'
+	},
+	{
+		name: 'Small B',
+		feedUrl: 'https://b.example/feed',
+		weight: 2,
+		defaultSection: 'Local',
+		language: 'en'
+	},
+	{
+		name: 'Small C',
+		feedUrl: 'https://c.example/feed',
+		weight: 2,
+		defaultSection: 'Local',
+		language: 'en'
+	}
 ];
 
 function article(source: string, headline: string): Article {

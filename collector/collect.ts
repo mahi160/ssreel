@@ -28,6 +28,32 @@ function trimToExcerpt(text: string): string {
 	return text.length <= MAX_EXCERPT_CHARS ? text : text.slice(0, MAX_EXCERPT_CHARS) + '\u2026';
 }
 
+// Caps how many articles are extracted/imaged at once across the *entire*
+// run, not per source — 15 sources each running their own items in parallel
+// would otherwise stack into hundreds of concurrent page fetches, JSDOM
+// parses and sharp resizes, risking CI memory pressure and publisher rate
+// limits. ponytail: a plain shared counter, not a library — good enough for
+// one build-time job with no nested/dynamic scheduling needs.
+function pLimit(concurrency: number) {
+	let active = 0;
+	const queue: (() => void)[] = [];
+	const next = () => {
+		active--;
+		queue.shift()?.();
+	};
+	return function <T>(fn: () => Promise<T>): Promise<T> {
+		return new Promise((resolve, reject) => {
+			const run = () => {
+				active++;
+				fn().then(resolve, reject).finally(next);
+			};
+			if (active < concurrency) run();
+			else queue.push(run);
+		});
+	};
+}
+const limit = pLimit(8);
+
 /**
  * Keeps the first occurrence of each article id. The same story can be
  * syndicated under more than one of an outlet's own feeds (e.g. BBC News and
@@ -50,13 +76,15 @@ async function collectSource(source: Source, runId: string): Promise<Article[]> 
 			// skipped without discarding the valid entries around it.
 			try {
 				const id = articleId(item.link!);
-				const extracted = await extractArticle(item.link!);
+				const extracted = await limit(() => extractArticle(item.link!));
 				const fallback = item.contentSnippet ?? item.content ?? '';
 				const body = extracted?.body ?? fallback;
 				const excerpt = extracted?.excerpt ?? trimToExcerpt(fallback);
 				if (!body) return undefined; // nothing readable at all
 
-				const image = extracted?.imageUrl ? await processImage(extracted.imageUrl, id) : undefined;
+				const image = extracted?.imageUrl
+					? await limit(() => processImage(extracted.imageUrl!, id))
+					: undefined;
 
 				return {
 					id,

@@ -5,7 +5,7 @@
 	import { settings } from '#lib/data/settings.svelte.js';
 	import { viewport } from './viewport.svelte.js';
 	import ArticleContent from './ArticleContent.svelte';
-	import { cn } from '@/utils.js';
+	import { cn } from '#lib/utils.js';
 
 	let {
 		articles,
@@ -22,7 +22,6 @@
 	} = $props();
 
 	const selected = $derived(articles.find((a) => a.id === currentId) ?? articles[0]);
-	let expanded = $state(false);
 
 	$effect(() => {
 		const article = selected;
@@ -43,7 +42,6 @@
 		if (index === -1) return;
 		const next = Math.min(articles.length - 1, Math.max(0, index + delta));
 		onSelect(articles[next].id);
-		expanded = false;
 	}
 
 	function onKeydown(e: KeyboardEvent) {
@@ -52,9 +50,6 @@
 			e.preventDefault();
 		} else if (e.key === 'ArrowUp') {
 			move(-1);
-			e.preventDefault();
-		} else if (e.key === 'Enter' || e.key === ' ') {
-			expanded = !expanded;
 			e.preventDefault();
 		} else if ((e.key === 'Backspace' || e.key === 'Delete') && selected) {
 			onHide(selected.id);
@@ -69,16 +64,20 @@
 </script>
 
 <div class="hidden h-dvh w-full grid-cols-[22rem_1fr] gap-8 overflow-hidden p-6 lg:grid">
-	<aside class="flex min-h-0 flex-col rounded-3xl border bg-[var(--press-glass)] shadow-[0_24px_80px_color-mix(in_oklch,var(--foreground)_14%,transparent)] backdrop-blur-xl">
+	<aside
+		class="flex min-h-0 flex-col rounded-3xl border bg-[var(--press-glass)] shadow-[0_24px_80px_color-mix(in_oklch,var(--foreground)_14%,transparent)] backdrop-blur-xl"
+	>
 		<div class="border-b p-5">
 			<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Wire stack</p>
-			<p class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em]">{articles.length} unread</p>
+			<p class="mt-2 font-heading text-xl leading-none font-black tracking-[-0.02em]">
+				{articles.length} unread
+			</p>
 		</div>
 		<ul
 			bind:this={container}
 			tabindex="0"
 			role="listbox"
-			aria-label="Articles: up/down to select, enter to expand, backspace to hide"
+			aria-label="Articles: up/down to select, backspace to hide"
 			onkeydown={onKeydown}
 			class="min-h-0 flex-1 overflow-y-auto p-2 focus-visible:outline focus-visible:outline-ring"
 		>
@@ -94,15 +93,15 @@
 								? 'border-foreground/20 bg-card shadow-[0.35rem_0.35rem_0_var(--accent)]'
 								: 'hover:border-foreground/10 hover:bg-card/65'
 						)}
-						onclick={() => {
-							onSelect(article.id);
-							expanded = false;
-						}}
+						onclick={() => onSelect(article.id)}
 					>
-						<span class="mt-1 h-full min-h-10 rounded-full bg-[var(--accent)]" aria-hidden="true"></span>
+						<span class="mt-1 h-full min-h-10 rounded-full bg-[var(--accent)]" aria-hidden="true"
+						></span>
 						<span class="min-w-0">
 							<span class="block truncate text-sm font-semibold">{article.headline}</span>
-							<span class="mt-1 block truncate text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase">
+							<span
+								class="mt-1 block truncate text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase"
+							>
 								{article.section} · {article.source}
 							</span>
 						</span>
@@ -114,7 +113,7 @@
 
 	<main class="flex min-h-0 items-center justify-center pb-16">
 		{#if selected}
-			<ArticleContent article={selected} {expanded} />
+			<ArticleContent article={selected} onHide={() => onHide(selected.id)} />
 		{/if}
 	</main>
 </div>

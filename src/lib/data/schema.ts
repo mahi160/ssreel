@@ -40,9 +40,13 @@ export interface Article {
 	rank: number;
 }
 
-export function articleLanguage(article: Pick<Article, 'language' | 'headline' | 'excerpt' | 'body'>): Language {
+export function articleLanguage(
+	article: Pick<Article, 'language' | 'headline' | 'excerpt' | 'body'>
+): Language {
 	if (article.language) return article.language;
-	return /[\u0980-\u09FF]/.test(`${article.headline} ${article.excerpt} ${article.body}`) ? 'bn' : 'en';
+	return /[\u0980-\u09FF]/.test(`${article.headline} ${article.excerpt} ${article.body}`)
+		? 'bn'
+		: 'en';
 }
 
 export interface Run {

@@ -2,6 +2,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
+import { readCapped } from './fetchCapped.ts';
 
 const OUT_DIR = path.join(import.meta.dirname, '../static/images');
 const CARD_WIDTH = 800;
@@ -20,9 +21,11 @@ export async function processImage(
 		const res = await fetch(imageUrl, { signal: AbortSignal.timeout(15_000) });
 		if (!res.ok) return undefined;
 		if (!(res.headers.get('content-type') ?? '').startsWith('image/')) return undefined;
+		// Fast-path bail when the header is honest; readCapped enforces the real
+		// limit regardless, since the header can be absent or lie.
 		if (Number(res.headers.get('content-length') ?? 0) > MAX_SOURCE_BYTES) return undefined;
-		const bytes = await res.arrayBuffer();
-		if (bytes.byteLength > MAX_SOURCE_BYTES) return undefined; // content-length can be absent or lie
+		const bytes = await readCapped(res, MAX_SOURCE_BYTES);
+		if (!bytes) return undefined;
 
 		const webp = await sharp(Buffer.from(bytes))
 			.resize({ width: CARD_WIDTH, withoutEnlargement: true })
