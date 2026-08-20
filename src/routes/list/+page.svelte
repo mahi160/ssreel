@@ -45,7 +45,9 @@
 	}
 </script>
 
-<div class="mx-auto flex h-dvh w-full max-w-5xl flex-col gap-4 overflow-hidden p-4 pb-6 sm:p-6">
+<div
+	class="mx-auto flex h-dvh w-full max-w-5xl flex-col gap-4 overflow-hidden p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6 sm:p-6 sm:pt-[max(1.5rem,env(safe-area-inset-top))]"
+>
 	<header class="press-card border bg-card p-4 sm:p-5">
 		<div class="flex items-start justify-between gap-4">
 			<div>

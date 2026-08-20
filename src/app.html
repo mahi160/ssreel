@@ -2,10 +2,24 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- viewport-fit=cover: lets our own full-bleed cards draw under the
+		     status bar/notch instead of the OS leaving a plain bar above them
+		     (see layout.css's safe-area padding on the overlay controls). -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="text-scale" content="scale" />
 		<link rel="manifest" href="/manifest.webmanifest" />
-		<meta name="theme-color" content="#16211c" />
+		<!-- Two theme-colors so Android's chrome/status bar matches whichever
+		     palette is showing on first paint; +layout.svelte overwrites this at
+		     runtime once the reader's own dark-mode setting (not just the OS's)
+		     is known. -->
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#eaf4f9" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#05131c" />
+		<!-- iOS ignores the manifest/theme-color above for installed PWAs; these
+		     are what it actually reads. black-translucent draws our content under
+		     the status bar instead of painting a solid bar over it. -->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="ssreel" />
 		<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 		%sveltekit.head%
 	</head>

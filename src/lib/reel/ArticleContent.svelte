@@ -62,7 +62,7 @@
 			aria-hidden="true"
 		></div>
 		<span
-			class="absolute top-3 left-3 rounded-full border border-white/25 bg-[color-mix(in_oklch,var(--accent)_55%,transparent)] px-3 py-1 text-xs font-semibold text-white backdrop-blur-md"
+			class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 rounded-full border border-white/25 bg-[color-mix(in_oklch,var(--accent)_55%,transparent)] px-3 py-1 text-xs font-semibold text-white backdrop-blur-md"
 		>
 			{article.section}
 		</span>
@@ -70,7 +70,7 @@
 			<button
 				type="button"
 				aria-label="Hide article"
-				class="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur-md transition hover:bg-white/25 focus-visible:outline focus-visible:outline-white"
+				class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur-md transition hover:bg-white/25 focus-visible:outline focus-visible:outline-white"
 				onclick={handleHide}
 			>
 				<IconX size={18} />

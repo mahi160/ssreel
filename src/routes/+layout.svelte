@@ -17,6 +17,14 @@
 
 	$effect(() => {
 		document.documentElement.classList.toggle('dark', isDark);
+		// The two prefers-color-scheme theme-color tags in app.html only cover
+		// the OS preference; the reader can override dark mode independently of
+		// it (settings.darkMode), so Android's status bar/chrome tint has to be
+		// pushed to match what's actually on screen once we know that.
+		const color = isDark ? '#05131c' : '#eaf4f9';
+		for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+			meta.setAttribute('content', color);
+		}
 	});
 </script>
 
