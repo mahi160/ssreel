@@ -20,7 +20,7 @@
 </script>
 
 <div
-	class="flex h-dvh w-full snap-start snap-always items-center justify-center p-4"
+	class="flex h-dvh w-full snap-start snap-always items-center justify-center px-4 pt-4 pb-24 sm:p-6 lg:p-8"
 	data-article-id={article.id}
 	use:dwellTracker={{ onActive, onRead }}
 	use:cardGestures={{ onTap: () => (expanded = !expanded), onHide }}
