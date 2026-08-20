@@ -90,6 +90,17 @@ jobs:
 
       - run: pnpm build
 
+      # wrangler pages deploy doesn't auto-create the project (unlike older
+      # Pages CLI versions) — idempotent, so this is a no-op once the project
+      # exists and never needs a manual dashboard click again.
+      - name: Ensure Cloudflare Pages project exists
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm exec wrangler pages project list | grep -qw ssreel || \
+            pnpm exec wrangler pages project create ssreel --production-branch=main
+
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
