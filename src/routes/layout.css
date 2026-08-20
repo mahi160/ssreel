@@ -189,42 +189,4 @@
 			transparent 0.8rem 1.22rem
 		);
 	}
-
-	.press-pass-hole {
-		background: radial-gradient(circle at center, var(--background) 0 44%, transparent 45%);
-	}
-
-	.scanline {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.scanline::after {
-		content: '';
-		position: absolute;
-		inset-inline: -20%;
-		inset-block-start: 0;
-		height: 3px;
-		background: linear-gradient(90deg, transparent, var(--accent), transparent);
-		opacity: 0.72;
-		animation: scan-pass 3.8s ease-in-out infinite;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.scanline::after {
-			animation: none;
-			display: none;
-		}
-	}
-}
-
-@keyframes scan-pass {
-	0%,
-	18% {
-		transform: translateY(-1rem);
-	}
-	72%,
-	100% {
-		transform: translateY(110dvh);
-	}
 }

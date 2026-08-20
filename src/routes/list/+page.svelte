@@ -53,7 +53,7 @@
 					Article ledger
 				</p>
 				<h1
-					class="mt-2 font-heading text-5xl leading-none font-black tracking-[-0.06em] sm:text-7xl"
+					class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em] sm:text-4xl"
 				>
 					Clips
 				</h1>
