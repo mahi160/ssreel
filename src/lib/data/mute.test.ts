@@ -30,11 +30,15 @@ describe('isMuted', () => {
 	});
 
 	it('is not muted when neither matches', () => {
-		expect(isMuted(article(), { ...noFilters, mutedSections: ['Tech'], mutedSources: ['Variety'] })).toBe(false);
+		expect(
+			isMuted(article(), { ...noFilters, mutedSections: ['Tech'], mutedSources: ['Variety'] })
+		).toBe(false);
 	});
 
 	it('filters by language', () => {
 		expect(isMuted(article({ language: 'bn' }), { ...noFilters, languageFilter: 'en' })).toBe(true);
-		expect(isMuted(article({ language: 'bn' }), { ...noFilters, languageFilter: 'bn' })).toBe(false);
+		expect(isMuted(article({ language: 'bn' }), { ...noFilters, languageFilter: 'bn' })).toBe(
+			false
+		);
 	});
 });

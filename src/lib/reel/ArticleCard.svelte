@@ -25,5 +25,5 @@
 	use:dwellTracker={{ onActive, onRead }}
 	use:cardGestures={{ onTap: () => (expanded = !expanded), onHide }}
 >
-	<ArticleContent {article} {expanded} />
+	<ArticleContent {article} {expanded} onToggleExpand={() => (expanded = !expanded)} {onHide} />
 </div>
