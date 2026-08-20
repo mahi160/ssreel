@@ -4,6 +4,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	// The service worker names its app-shell cache after this so a new deploy
+	// never serves a stale shell (ADR-0009) — not $app/env's `version`, which
+	// doesn't resolve in the serviceWorker build target on this SvelteKit
+	// version.
+	define: { __BUILD_ID__: JSON.stringify(String(Date.now())) },
 	plugins: [
 		tailwindcss(),
 		sveltekit({

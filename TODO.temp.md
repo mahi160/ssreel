@@ -11,7 +11,7 @@
 - [x] 9. List view with unread, read and hidden filters
 - [x] 10. Settings: mute, storage, and reading options
 - [x] 11. Desktop two-pane layout and keyboard navigation
-- [ ] 12. PWA: installable, offline, and never stale
+- [x] 12. PWA: installable, offline, and never stale
 - [ ] 13. Scheduled pipeline with durable image storage
 
 Each ticket: implement -> typecheck -> test -> review -> commit.

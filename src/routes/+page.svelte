@@ -7,6 +7,7 @@
 	import { settings } from '#lib/data/settings.svelte.js';
 	import {
 		unreadArticles,
+		syncedRunIds,
 		getArticle,
 		hideArticle,
 		unhideArticle,
@@ -22,6 +23,11 @@
 
 	let articles = $state<StoredArticle[]>([]);
 	let reelKey = $state(0); // bumped to remount Reel, resetting scroll to the top article
+	// Distinguishes a genuine "caught up" (has synced before, nothing left
+	// unread) from a fresh install that's never reached the network — the
+	// latter needs an explanation, not a countdown to an edition it can't
+	// promise exists.
+	let hasSyncedEver = $state(true);
 
 	// Muting is display-only: `articles` always holds every unread article on
 	// the device, so unmuting reveals matches instantly with no reload or refetch.
@@ -48,6 +54,7 @@
 
 	async function load() {
 		articles = await unreadArticles();
+		hasSyncedEver = (await syncedRunIds()).size > 0;
 	}
 
 	// The list can send the reader to a specific article — including a read or
@@ -83,6 +90,7 @@
 			additions.push({ ...a, state: 'unread', stateChangedAt: run.generatedAt, dwellMs: 0 });
 		}
 		articles = [...articles, ...additions].sort(byRunThenRank);
+		hasSyncedEver = true; // a run just landed, so this is no longer "never synced"
 	}
 
 	$effect(() => {
@@ -156,7 +164,7 @@
 		onRead={(id) => (articles = articles.filter((a) => a.id !== id))}
 		onHide={handleHide}
 	/>
-{:else}
+{:else if hasSyncedEver}
 	{@const nextRun = nextRunAt()}
 	<div class="flex h-dvh w-full flex-col items-center justify-center gap-1 p-4 text-center">
 		<p class="text-lg">You're caught up.</p>
@@ -166,5 +174,10 @@
 				minute: '2-digit'
 			})} ({formatCountdown(nextRun)})
 		</p>
+	</div>
+{:else}
+	<div class="flex h-dvh w-full flex-col items-center justify-center gap-1 p-4 text-center">
+		<p class="text-lg">No articles yet.</p>
+		<p class="text-muted-foreground">Connect to the internet to get today's edition.</p>
 	</div>
 {/if}

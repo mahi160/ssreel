@@ -1,6 +1,7 @@
 // A device reconciling itself against the index and downloading what it lacks.
 import type { Index, Run } from './schema.ts';
 import { pruneRunsBefore, storeRun, syncedRunIds } from './db.ts';
+import { cacheImages } from './cache.ts';
 import { WINDOW_DAYS } from './window.ts';
 
 async function syncRun(id: string): Promise<Run | undefined> {
@@ -10,6 +11,7 @@ async function syncRun(id: string): Promise<Run | undefined> {
 		if (!runRes.ok) return undefined;
 		const run: Run = await runRes.json();
 		await storeRun(run.id, run.generatedAt, run.articles);
+		await cacheImages(run.articles); // best-effort; storeRun above is what actually matters
 		return run;
 	} catch (err) {
 		console.error(`sync: run ${id} failed:`, err);

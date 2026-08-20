@@ -2,6 +2,7 @@
 // runs (which ones are already synced, so a reload never refetches them).
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { Article } from './schema.ts';
+import { evictRun } from './cache.ts';
 
 export type ReadState = 'unread' | 'read' | 'hidden';
 
@@ -72,10 +73,12 @@ export async function pruneRunsBefore(cutoffIso: string): Promise<void> {
 
 	for (const run of staleRuns) {
 		const tx = db.transaction(['articles', 'runs'], 'readwrite');
-		const articleIds = await tx.objectStore('articles').index('runId').getAllKeys(run.id);
-		for (const id of articleIds) await tx.objectStore('articles').delete(id);
+		const articles = await tx.objectStore('articles').index('runId').getAll(run.id);
+		for (const article of articles) await tx.objectStore('articles').delete(article.id);
 		await tx.objectStore('runs').delete(run.id);
 		await tx.done;
+
+		await evictRun(run.id, articles);
 	}
 }
 
