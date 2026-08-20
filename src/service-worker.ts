@@ -9,8 +9,12 @@
 //  - run files and images are immutable: cache-first, never revalidated
 import { IMMUTABLE_CACHE, DATA_CACHE } from '#lib/data/cacheNames.js';
 
-declare const __BUILD_ID__: string;
-const SHELL_CACHE = `ssreel-shell-${__BUILD_ID__}`;
+// ponytail: `vite dev` never runs the build's define-substitution for this
+// file (only `vite build`'s dedicated serviceWorker step does), so the
+// global is missing in dev — fall back to a fixed dev cache name instead of
+// crashing the SW's evaluation.
+declare const __BUILD_ID__: string | undefined;
+const SHELL_CACHE = `ssreel-shell-${typeof __BUILD_ID__ === 'undefined' ? 'dev' : __BUILD_ID__}`;
 
 self.addEventListener('install', (event) => {
 	event.waitUntil(
