@@ -1,9 +1,13 @@
 // Recovering an article's readable body from the publisher's page (ADR-0003).
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { Readability } from '@mozilla/readability';
+import { readCapped } from './fetchCapped.ts';
 
 export const MAX_BODY_CHARS = 4000;
 export const MAX_EXCERPT_CHARS = 400;
+// A publisher page shouldn't be able to stall the build on a huge or
+// malformed response — same rationale as image.ts's MAX_SOURCE_BYTES.
+const MAX_HTML_BYTES = 5_000_000;
 
 /** Trims to a max length on a word boundary, never mid-word. */
 function trim(text: string, max: number): string {
@@ -26,7 +30,9 @@ export async function extractArticle(url: string): Promise<Extracted | undefined
 			signal: AbortSignal.timeout(15_000)
 		});
 		if (!res.ok) return undefined;
-		const html = await res.text();
+		const bytes = await readCapped(res, MAX_HTML_BYTES);
+		if (!bytes) return undefined;
+		const html = new TextDecoder().decode(bytes);
 
 		// jsdom logs unparsable stylesheets to console by default; publisher pages are noisy.
 		const dom = new JSDOM(html, { url, virtualConsole: new VirtualConsole() });

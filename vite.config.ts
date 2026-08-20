@@ -19,9 +19,6 @@ export default defineConfig({
 				experimental: { async: true }
 			},
 			adapter: adapter(),
-			alias: {
-				'@/*': './src/lib/*'
-			},
 			experimental: { remoteFunctions: true }
 		})
 	]

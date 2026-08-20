@@ -60,6 +60,23 @@ async function cacheFirst(request, cacheName) {
 	return response;
 }
 
+// Only '/' is precached on install. A route that was never visited online
+// (a deep link, a bookmark) would otherwise fail outright when offline
+// instead of booting the shell and letting the client-side router take it
+// from there — every successful navigation response is cached under the
+// same '/' key so it doubles as that fallback.
+async function navigationFirst(request) {
+	try {
+		const response = await fetch(request);
+		if (response.ok) (await caches.open(SHELL_CACHE)).put('/', response.clone());
+		return response;
+	} catch (err) {
+		const shell = await (await caches.open(SHELL_CACHE)).match('/');
+		if (shell) return shell;
+		throw err;
+	}
+}
+
 self.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET') return;
 	const url = new URL(event.request.url);
@@ -69,6 +86,8 @@ self.addEventListener('fetch', (event) => {
 		event.respondWith(networkFirst(event.request, DATA_CACHE));
 	} else if (url.pathname.startsWith('/data/runs/') || url.pathname.startsWith('/images/')) {
 		event.respondWith(cacheFirst(event.request, IMMUTABLE_CACHE));
+	} else if (event.request.mode === 'navigate') {
+		event.respondWith(navigationFirst(event.request));
 	} else {
 		event.respondWith(cacheFirst(event.request, SHELL_CACHE));
 	}
