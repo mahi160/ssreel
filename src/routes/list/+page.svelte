@@ -13,7 +13,9 @@
 	async function load() {
 		articles = await allArticles();
 	}
-	load();
+	$effect(() => {
+		load(); // IndexedDB only exists in the browser — must not run during SSR
+	});
 
 	const filtered = $derived(
 		articles

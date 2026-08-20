@@ -30,7 +30,9 @@
 		sources = [...new Set(articles.map((a) => a.source))].sort();
 		storageBytes = usage;
 	}
-	loadStorageInfo();
+	$effect(() => {
+		loadStorageInfo(); // IndexedDB only exists in the browser — must not run during SSR
+	});
 
 	function formatBytes(bytes: number): string {
 		if (bytes < 1024) return `${bytes} B`;
