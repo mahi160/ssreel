@@ -18,6 +18,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@fontsource-variable/fraunces": "^5.3.0",
 		"@fontsource-variable/ibm-plex-sans": "^5.3.0",
 		"@fontsource-variable/noto-sans": "^5.3.0",
 		"@fontsource-variable/noto-sans-bengali": "^5.3.0",
@@ -38,7 +39,6 @@
 		"fake-indexeddb": "^6.2.5",
 		"globals": "^17.6.0",
 		"happy-dom": "^20.11.2",
-		"mode-watcher": "^1.1.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",

@@ -18,7 +18,11 @@ const OUT_DIR = path.join(import.meta.dirname, '../static/data');
 const INDEX_PATH = path.join(OUT_DIR, 'index.json');
 const RUNS_DIR = path.join(OUT_DIR, 'runs');
 
-const parser = new Parser();
+const parser = new Parser({
+	headers: {
+		'user-agent': 'Mozilla/5.0 (compatible; ssreel/1.0; +https://ssreel.local)'
+	}
+});
 
 function trimToExcerpt(text: string): string {
 	return text.length <= MAX_EXCERPT_CHARS ? text : text.slice(0, MAX_EXCERPT_CHARS) + '\u2026';
@@ -63,6 +67,7 @@ async function collectSource(source: Source, runId: string): Promise<Article[]> 
 					section: classifySection(item.link!, item.categories ?? [], source.defaultSection),
 					url: item.link!,
 					source: source.name,
+					language: source.language,
 					publishedAt: item.isoDate ?? new Date().toISOString(),
 					runId,
 					rank: 0 // overwritten once the run's final weight order is known

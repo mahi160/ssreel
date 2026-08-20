@@ -18,16 +18,23 @@ function article(overrides: Partial<Article> = {}): Article {
 	};
 }
 
+const noFilters = { mutedSections: [], mutedSources: [], languageFilter: 'mixed' as const };
+
 describe('isMuted', () => {
 	it('is muted when its section is muted', () => {
-		expect(isMuted(article(), { mutedSections: ['Sports'], mutedSources: [] })).toBe(true);
+		expect(isMuted(article(), { ...noFilters, mutedSections: ['Sports'] })).toBe(true);
 	});
 
 	it('is muted when its source is muted', () => {
-		expect(isMuted(article(), { mutedSections: [], mutedSources: ['BBC Sport'] })).toBe(true);
+		expect(isMuted(article(), { ...noFilters, mutedSources: ['BBC Sport'] })).toBe(true);
 	});
 
 	it('is not muted when neither matches', () => {
-		expect(isMuted(article(), { mutedSections: ['Tech'], mutedSources: ['Variety'] })).toBe(false);
+		expect(isMuted(article(), { ...noFilters, mutedSections: ['Tech'], mutedSources: ['Variety'] })).toBe(false);
+	});
+
+	it('filters by language', () => {
+		expect(isMuted(article({ language: 'bn' }), { ...noFilters, languageFilter: 'en' })).toBe(true);
+		expect(isMuted(article({ language: 'bn' }), { ...noFilters, languageFilter: 'bn' })).toBe(false);
 	});
 });
