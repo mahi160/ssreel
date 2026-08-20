@@ -12,6 +12,6 @@
 - [x] 10. Settings: mute, storage, and reading options
 - [x] 11. Desktop two-pane layout and keyboard navigation
 - [x] 12. PWA: installable, offline, and never stale
-- [ ] 13. Scheduled pipeline with durable image storage
+- [x] 13. Scheduled pipeline with durable image storage
 
 Each ticket: implement -> typecheck -> test -> review -> commit.

@@ -3,11 +3,18 @@ name: Deploy
 on:
   push:
     branches: [main]
+  schedule:
+    # 00/06/12/18 Bangladesh time (UTC+6) = 18/00/06/12 UTC.
+    - cron: '0 18,0,6,12 * * *'
+  workflow_dispatch: {}
 
 # A partial deploy from an overlapping run would race the collector's output;
-# one deploy for the branch at a time (ticket 13 adds the scheduled trigger).
+# one deploy for the branch at a time, so two scheduled runs can't overlap.
 concurrency:
   group: deploy-${{ github.ref }}
+
+permissions:
+  contents: write # scheduled runs commit the collector's dedupe state back
 
 jobs:
   deploy:
@@ -22,8 +29,65 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      # static/data and static/images are build artifacts (ADR-0002/0005), not
+      # committed to git, but a Cloudflare Pages deploy replaces the whole
+      # site every time — every build has to materialise the *whole*
+      # retention window, not just the run just collected. The durable copy
+      # lives as a release asset, entirely outside git history; the Actions
+      # cache is only a fast path in front of it, since the cache alone is
+      # evicted after 7 days idle or 10GB and would otherwise force
+      # refetching the whole window from publishers (ADR-0010).
+      - name: Restore collector output (fast path)
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            static/data
+            static/images
+          key: collector-${{ github.run_id }}
+          restore-keys: collector-
+
+      - name: Restore collector output (durable fallback)
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p static/data static/images
+          if gh release download collector-cache --pattern 'collector-output.tar.gz' --dir /tmp --clobber; then
+            tar -xzf /tmp/collector-output.tar.gz -C static
+          fi
+
       - run: node collector/collect.ts
       - run: test -s static/data/index.json # every outlet failing shouldn't silently deploy an empty site
+
+      - name: Save collector output (fast path)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            static/data
+            static/images
+          key: collector-${{ github.run_id }}
+
+      - name: Save collector output (durable)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tar -czf /tmp/collector-output.tar.gz -C static data images
+          gh release delete collector-cache --yes --cleanup-tag || true
+          gh release create collector-cache /tmp/collector-output.tar.gz \
+            --title "Collector output cache (not a release)" \
+            --notes "Durable store for the collector's run data and images between builds. Not for humans."
+
+      - name: Commit dedupe state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add collector/state.json
+          git diff --cached --quiet || git commit -m "chore: update collector dedupe state [skip ci]"
+          git push
+
       - run: pnpm build
 
       - uses: cloudflare/wrangler-action@v3

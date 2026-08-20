@@ -7,9 +7,10 @@ import { articleId } from './id.ts';
 import { extractArticle, MAX_EXCERPT_CHARS } from './extract.ts';
 import { processImage } from './image.ts';
 import { classifySection } from './section.ts';
-import { loadSeenIds, saveSeenIds } from './dedupe.ts';
+import { loadSeenIds, pruneSeenIds, saveSeenIds } from './dedupe.ts';
 import { orderByWeight } from './weight.ts';
 import { publishFeed } from './feed.ts';
+import { prunePublished, windowCutoff } from './prune.ts';
 import { SOURCES, type Source } from './sources.ts';
 import type { Article, Index, Run } from '../src/lib/data/schema.ts';
 
@@ -95,7 +96,8 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 	}
 	articles = dedupeById(articles);
 
-	const seen = await loadSeenIds();
+	const cutoff = windowCutoff();
+	const seen = pruneSeenIds(await loadSeenIds(), cutoff);
 	articles = articles.filter((a) => !seen.has(a.id));
 	articles = orderByWeight(articles, sources).map((a, rank) => ({ ...a, rank }));
 
@@ -114,9 +116,10 @@ export async function collect(sources: Source[] = SOURCES): Promise<Run> {
 	// with them. A crash in between means the next run may re-collect and
 	// re-publish this run's articles as "new" — a visible, harmless duplicate
 	// (ADR-0007), not data loss.
-	for (const a of articles) seen.add(a.id);
+	for (const a of articles) seen.set(a.id, run.generatedAt);
 	await saveSeenIds(seen);
 
+	await prunePublished(cutoff);
 	await publishFeed();
 
 	return run;
