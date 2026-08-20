@@ -27,7 +27,7 @@ feeds look as good as the curated ones.
 ## Consequences
 
 - No CORS proxy, XML parser or Readability pass ships in the client.
-- The admin surface manages which sections and sources are *shown*, not which
-  URLs are *fetched*.
+- The admin surface manages which sections and sources are _shown_, not which
+  URLs are _fetched_.
 - ssreel is coupled to the digest's manifest format; a breaking change upstream
   breaks ssreel.

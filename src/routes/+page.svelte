@@ -19,7 +19,7 @@
 	import Reel from '#lib/reel/Reel.svelte';
 	import DesktopPane from '#lib/reel/DesktopPane.svelte';
 	import { viewport } from '#lib/reel/viewport.svelte.js';
-	import { Button } from '@/ui/button/index.js';
+	import { Button } from '#lib/ui/button/index.js';
 
 	let articles = $state<StoredArticle[]>([]);
 	let reelKey = $state(0); // bumped to remount Reel, resetting scroll to the top article
@@ -138,14 +138,34 @@
 	}
 </script>
 
-<div class="fixed inset-x-0 bottom-3 z-20 mx-auto flex w-fit items-center gap-1 rounded-full border bg-[var(--press-glass)] p-1 shadow-[0_18px_50px_color-mix(in_oklch,var(--foreground)_18%,transparent)] backdrop-blur-xl lg:top-4 lg:right-4 lg:bottom-auto lg:left-auto lg:mx-0">
-	<Button variant="ghost" size="icon" aria-label="Refresh editions" onclick={refresh} class="rounded-full">
+<div
+	class="fixed inset-x-0 bottom-3 z-20 mx-auto flex w-fit items-center gap-1 rounded-full border bg-[var(--press-glass)] p-1 shadow-[0_18px_50px_color-mix(in_oklch,var(--foreground)_18%,transparent)] backdrop-blur-xl lg:top-4 lg:right-4 lg:bottom-auto lg:left-auto lg:mx-0"
+>
+	<Button
+		variant="ghost"
+		size="icon"
+		aria-label="Refresh editions"
+		onclick={refresh}
+		class="rounded-full"
+	>
 		<IconRefresh />
 	</Button>
-	<Button variant="ghost" size="icon" href="/list" aria-label="Open article ledger" class="rounded-full">
+	<Button
+		variant="ghost"
+		size="icon"
+		href="/list"
+		aria-label="Open article ledger"
+		class="rounded-full"
+	>
 		<IconList />
 	</Button>
-	<Button variant="ghost" size="icon" href="/settings" aria-label="Tune sources" class="rounded-full">
+	<Button
+		variant="ghost"
+		size="icon"
+		href="/settings"
+		aria-label="Tune sources"
+		class="rounded-full"
+	>
 		<IconSettings />
 	</Button>
 </div>
@@ -172,7 +192,9 @@
 	{@const nextRun = nextRunAt()}
 	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
 		<div class="press-card scanline max-w-sm border bg-card p-8">
-			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Wire quiet</p>
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+				Wire quiet
+			</p>
 			<p class="font-heading text-4xl leading-none font-black tracking-tight">Caught up.</p>
 			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
 				Next edition drops at {nextRun.toLocaleTimeString(undefined, {
@@ -185,7 +207,9 @@
 {:else}
 	<div class="flex h-dvh w-full items-center justify-center p-6 text-center">
 		<div class="press-card max-w-sm border bg-card p-8">
-			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">No cache</p>
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+				No cache
+			</p>
 			<p class="font-heading text-4xl leading-none font-black tracking-tight">No articles yet.</p>
 			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">
 				Connect to the internet to load today's first edition.
