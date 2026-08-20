@@ -1,19 +1,28 @@
 // One reader's own preferences on this device (CONTEXT.md — Settings). No
 // account, no server: plain localStorage, read once and kept live in memory.
-import type { Section } from './schema.ts';
+import type { LanguageFilter, Section } from './schema.ts';
 
 export const DEFAULT_DWELL_MS = 4000;
+export type DarkMode = 'system' | 'light' | 'dark';
 
 export interface Settings {
 	mutedSections: Section[];
 	mutedSources: string[];
 	dwellMs: number;
+	darkMode: DarkMode;
+	languageFilter: LanguageFilter;
 }
 
 const STORAGE_KEY = 'ssreel:settings';
 
 function loadSettings(): Settings {
-	const defaults: Settings = { mutedSections: [], mutedSources: [], dwellMs: DEFAULT_DWELL_MS };
+	const defaults: Settings = {
+		mutedSections: [],
+		mutedSources: [],
+		dwellMs: DEFAULT_DWELL_MS,
+		darkMode: 'system',
+		languageFilter: 'mixed'
+	};
 	if (typeof localStorage === 'undefined') return defaults;
 	try {
 		return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') };
@@ -46,6 +55,16 @@ export function toggleMutedSection(section: Section) {
 
 export function toggleMutedSource(source: string) {
 	settings.mutedSources = toggle(settings.mutedSources, source);
+	persist();
+}
+
+export function setDarkMode(mode: DarkMode) {
+	settings.darkMode = mode;
+	persist();
+}
+
+export function setLanguageFilter(languageFilter: LanguageFilter) {
+	settings.languageFilter = languageFilter;
 	persist();
 }
 
