@@ -21,7 +21,9 @@ function loadSettings(): Settings {
 		mutedSources: [],
 		dwellMs: DEFAULT_DWELL_MS,
 		darkMode: 'system',
-		languageFilter: 'mixed'
+		// Bangla-first product (CONTEXT.md) — default new devices to it rather
+		// than adding a first-launch prompt for one setting.
+		languageFilter: 'bn'
 	};
 	if (typeof localStorage === 'undefined') return defaults;
 	try {
