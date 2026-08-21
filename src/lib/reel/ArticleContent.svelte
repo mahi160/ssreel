@@ -65,7 +65,7 @@
 			<button
 				type="button"
 				aria-label="Hide article"
-				class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur-md transition hover:bg-white/25 focus-visible:outline focus-visible:outline-white"
+				class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white transition hover:bg-black/55 focus-visible:outline focus-visible:outline-white"
 				onclick={handleHide}
 			>
 				<IconX size={18} />
@@ -73,13 +73,15 @@
 		{/if}
 	</div>
 
-	<!-- Glass panel overlapping the image's bottom edge — the "overlay" layer. Dashed
-	     rail on the left is the press-card motif, done as a plain border here (not
-	     the .press-card utility itself) since that utility's negative-offset rail
-	     and box-shadow assume a card with margin around it, which this doesn't
-	     have edge-to-edge on mobile. -->
+	<!-- Panel overlapping the image's bottom edge. Dashed rail on the left is the
+	     press-card motif, done as a plain border here (not the .press-card utility
+	     itself) since that utility's negative-offset rail and box-shadow assume a
+	     card with margin around it, which this doesn't have edge-to-edge on mobile.
+	     Solid bg-card, not a blurred glass panel (ADR-0013) — backdrop-filter has
+	     to recomposite every scroll frame, which is exactly what made paging
+	     choppy in the first place. -->
 	<div
-		class="relative -mt-5 shrink-0 border-t border-l-[3px] border-dashed bg-[var(--press-glass)] px-5 pt-4 pb-3 backdrop-blur-sm sm:rounded-tl-3xl sm:px-7"
+		class="relative -mt-5 shrink-0 border-t border-l-[3px] border-dashed bg-card px-5 pt-4 pb-3 sm:rounded-tl-3xl sm:px-7"
 		style="border-left-color: var(--accent)"
 	>
 		<p

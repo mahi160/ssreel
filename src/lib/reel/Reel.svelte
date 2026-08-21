@@ -1,14 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { gsap } from 'gsap';
-	import { Draggable } from 'gsap/Draggable';
-	import { InertiaPlugin } from 'gsap/InertiaPlugin';
 	import type { StoredArticle } from '#lib/data/db.js';
 	import { markRead } from '#lib/data/db.js';
 	import ArticleCard from './ArticleCard.svelte';
-	import { cn } from '#lib/utils.js';
-
-	gsap.registerPlugin(Draggable, InertiaPlugin);
 
 	let {
 		articles,
@@ -30,69 +23,21 @@
 		onRead(id); // instant: the card is already scrolled past
 		markRead(id, dwellMs).catch((err) => console.error('markRead failed:', err));
 	}
-
-	// Native scroll-snap is the accessibility/reduced-motion fallback
-	// (ADR-0012) — GSAP's drag/inertia only takes over when motion is
-	// actually wanted, so keyboard paging, VoiceOver swipe and a plain
-	// respect-my-settings reader all keep working exactly as before.
-	// ponytail: read once at mount, not a live media-query listener — unlike
-	// viewport.svelte.ts's isDesktop, a user flipping this mid-session is
-	// rare enough not to justify re-wiring an already-created Draggable.
-	let reduceMotion = $state(true);
-	let container = $state<HTMLDivElement>();
-
-	onMount(() => {
-		reduceMotion =
-			typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (reduceMotion || !container) return;
-
-		const el = container;
-		// Index the drag started from — without this, InertiaPlugin's own
-		// velocity-projected end value on a fast flick could land two or three
-		// cards away, which reads as randomly skipping articles, not paging.
-		// Clamping the snap target to at most one card from the press point is
-		// what makes a hard flick feel the same as a gentle one: always exactly
-		// one card, just faster.
-		let startIndex = 0;
-		// A single function form applies directly to the drag's one axis (type:
-		// 'scroll' here is vertical-only) — GSAP's own runtime also accepts a
-		// { scrollTop } object for this, but its types don't declare that key.
-		const [instance] = Draggable.create(el, {
-			type: 'scroll',
-			inertia: true,
-			maxDuration: 0.5,
-			minDuration: 0.2,
-			onPress() {
-				startIndex = Math.round(el.scrollTop / (el.clientHeight * 0.92));
-			},
-			// Cards are 92dvh tall (the peek), so that's the snap increment too.
-			snap: (value: number) => {
-				const card = el.clientHeight * 0.92;
-				const target = Math.round(value / card);
-				const clamped = Math.max(startIndex - 1, Math.min(startIndex + 1, target));
-				return clamped * card;
-			}
-		});
-		return () => instance.kill();
-	});
 </script>
 
 <!-- overscroll-contain here, not on each card's inner text scroll below, so a
      swipe that runs past the end of a long article's body chains straight
      into paging to the next card instead of dead-ending; contain sits at
      this outer boundary only, to stop the browser's own bounce/refresh
-     gesture at the very top/bottom of the whole reel. -->
-<div
-	bind:this={container}
-	class={cn(
-		'h-dvh w-full overflow-y-auto overscroll-contain',
-		reduceMotion && 'snap-y snap-mandatory'
-	)}
->
+     gesture at the very top/bottom of the whole reel.
+
+     Paging is plain CSS scroll-snap (ADR-0013, reverting ADR-0012) — the
+     browser's own touch/momentum handling is what a hand-rolled JS drag
+     library was never going to out-perform. -->
+<div class="h-dvh w-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
 	{#each articles as article (article.id)}
 		<ArticleCard
 			{article}
-			peek={!reduceMotion}
 			onActive={() => onActive?.(article.id)}
 			onRead={(dwellMs) => read(article.id, dwellMs)}
 			onHide={() => onHide(article.id)}
