@@ -57,6 +57,15 @@
 		}
 	}
 
+	function stamp(iso: string) {
+		return new Date(iso).toLocaleString(undefined, {
+			month: 'short',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit'
+		});
+	}
+
 	let container = $state<HTMLUListElement>();
 	$effect(() => {
 		if (viewport.isDesktop) container?.focus();
@@ -103,6 +112,9 @@
 								class="mt-1 block truncate text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase"
 							>
 								{article.section} · {article.source}
+							</span>
+							<span class="mt-0.5 block truncate text-[0.68rem] text-muted-foreground/80">
+								{stamp(article.publishedAt)}
 							</span>
 						</span>
 					</button>
