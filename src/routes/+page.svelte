@@ -24,6 +24,7 @@
 	let articles = $state<StoredArticle[]>([]);
 	let reelKey = $state(0);
 	let hasSyncedEver = $state(true);
+	let loading = $state(true);
 
 	const visibleArticles = $derived(articles.filter((a) => !isMuted(a, settings)));
 
@@ -44,6 +45,7 @@
 	async function load() {
 		articles = await unreadArticles();
 		hasSyncedEver = (await syncedRunIds()).size > 0;
+		loading = false;
 	}
 
 	async function focusFromList() {
@@ -161,7 +163,20 @@
 	</Button>
 </div>
 
-{#if visibleArticles.length > 0}
+{#if loading}
+	<div class="flex h-dvh w-full items-center justify-center p-6 text-center" role="status">
+		<div class="press-card max-w-sm border bg-card p-8">
+			<p class="mb-3 text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
+				Tuning in
+			</p>
+			<div
+				class="mx-auto size-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground"
+				aria-hidden="true"
+			></div>
+			<p class="mt-4 text-sm leading-relaxed text-muted-foreground">Loading your edition…</p>
+		</div>
+	</div>
+{:else if visibleArticles.length > 0}
 	<div class="lg:hidden">
 		{#key reelKey}
 			<Reel
