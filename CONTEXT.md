@@ -99,8 +99,8 @@ and classifies. Runs on CI, never in the browser.
 _Avoid_: Scraper, crawler, backend, digest
 
 **Run**:
-One collection cycle, four per day at 00/06/12/18 Bangladesh time. Articles
-arrive grouped by run, not as a continuous stream.
+One collection cycle, four per day at 07:50/13:50/19:50/00:50 Bangladesh time.
+Articles arrive grouped by run, not as a continuous stream.
 _Avoid_: Edition, batch, issue, update
 
 **Extraction**:
@@ -120,8 +120,16 @@ _Avoid_: Manifest, catalogue, directory
 
 **Window**:
 How far back published runs are kept before pruning, images included. A publishing
-policy only — devices keep what they have already downloaded regardless.
+policy for the collector only — see Retention for the separate, longer, on-device
+policy.
 _Avoid_: Retention, history, archive depth
+
+**Retention**:
+How long a device keeps a synced article, and its cached image, before purging it
+from local storage. Evicted uniformly by publish time regardless of read state,
+longer than the Window and tracked independently of it — once an article ages out
+here it cannot be re-synced, since the collector no longer publishes it either.
+_Avoid_: Window, cache duration, history depth
 
 **Sync**:
 A device reconciling itself against the index and downloading the runs it lacks.

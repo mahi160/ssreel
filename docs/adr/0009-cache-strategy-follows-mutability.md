@@ -1,3 +1,8 @@
+---
+status: superseded by ADR-0011 (device retention window only; the mutability-
+based cache split stands)
+---
+
 # Cache strategy follows mutability, and sync caches images explicitly
 
 Because article data is baked into each deploy, new articles only reach readers

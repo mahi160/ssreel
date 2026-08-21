@@ -2,7 +2,7 @@
 import type { Index, Run } from './schema.ts';
 import { pruneRunsBefore, storeRun, syncedRunIds } from './db.ts';
 import { cacheImages } from './cache.ts';
-import { WINDOW_DAYS } from './window.ts';
+import { RETENTION_DAYS } from './window.ts';
 
 async function syncRun(id: string): Promise<Run | undefined> {
 	// One bad run — network or JSON failure — shouldn't block the rest.
@@ -39,7 +39,7 @@ export async function sync(onRunSynced?: (run: Run) => void): Promise<void> {
 	if (!res.ok) throw new Error(`index fetch failed: ${res.status}`);
 	const index: Index = await res.json();
 
-	const cutoff = new Date(Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+	const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 	await pruneRunsBefore(cutoff);
 
 	const have = await syncedRunIds();

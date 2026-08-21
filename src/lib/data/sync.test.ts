@@ -3,6 +3,7 @@
 // own tests for.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Run } from './schema.ts';
+import { RETENTION_DAYS } from './window.ts';
 
 vi.mock('./db.ts', () => ({
 	storeRun: vi.fn(),
@@ -112,6 +113,23 @@ describe('sync', () => {
 		expect(synced).toEqual(['ccc']); // only the newest has landed by the time the promise resolves
 
 		await vi.waitFor(() => expect(synced).toEqual(['ccc', 'bb', 'a']));
+	});
+
+	it("prunes to RETENTION_DAYS, not the collector's (shorter) publish window", async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => jsonResponse({ runs: [] }))
+		);
+
+		const before = Date.now();
+		await sync();
+		const after = Date.now();
+
+		expect(pruneRunsBefore).toHaveBeenCalledTimes(1);
+		const cutoff = new Date(vi.mocked(pruneRunsBefore).mock.calls[0][0]).getTime();
+		const days = RETENTION_DAYS * 24 * 60 * 60 * 1000;
+		expect(cutoff).toBeGreaterThanOrEqual(before - days - 1000);
+		expect(cutoff).toBeLessThanOrEqual(after - days + 1000);
 	});
 
 	it('skips a run that fails to sync — newest or backfilled — without failing the rest', async () => {

@@ -1,3 +1,8 @@
+---
+status: superseded by ADR-0011 (device-side retention only; the immutable
+per-run-file publishing scheme stands)
+---
+
 # Article data ships as immutable per-run files behind a small index
 
 Each build publishes one JSON file per run plus a small `index.json` listing the

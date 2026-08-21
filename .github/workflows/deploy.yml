@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
   schedule:
-    # 00/06/12/18 Bangladesh time (UTC+6) = 18/00/06/12 UTC.
-    - cron: '0 18,0,6,12 * * *'
+    # 07:50/13:50/19:50/00:50 Bangladesh time (UTC+6) = 01:50/07:50/13:50/18:50 UTC.
+    - cron: '50 1,7,13,18 * * *'
   workflow_dispatch: {}
 
 # A partial deploy from an overlapping run would race the collector's output;
