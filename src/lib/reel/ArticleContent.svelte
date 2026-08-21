@@ -61,11 +61,6 @@
 			class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-card via-card/60 to-transparent"
 			aria-hidden="true"
 		></div>
-		<span
-			class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 rounded-full border border-white/25 bg-[color-mix(in_oklch,var(--accent)_55%,transparent)] px-3 py-1 text-xs font-semibold text-white backdrop-blur-md"
-		>
-			{article.section}
-		</span>
 		{#if onHide}
 			<button
 				type="button"
@@ -78,14 +73,29 @@
 		{/if}
 	</div>
 
-	<!-- Glass panel overlapping the image's bottom edge — the "overlay" layer. -->
+	<!-- Glass panel overlapping the image's bottom edge — the "overlay" layer. Dashed
+	     rail on the left is the press-card motif, done as a plain border here (not
+	     the .press-card utility itself) since that utility's negative-offset rail
+	     and box-shadow assume a card with margin around it, which this doesn't
+	     have edge-to-edge on mobile. -->
 	<div
-		class="relative -mt-5 shrink-0 rounded-t-3xl border-t bg-[var(--press-glass)] px-5 pt-4 pb-3 backdrop-blur-sm sm:px-7"
+		class="relative -mt-5 shrink-0 border-t border-l-[3px] border-dashed bg-[var(--press-glass)] px-5 pt-4 pb-3 backdrop-blur-sm sm:rounded-tl-3xl sm:px-7"
+		style="border-left-color: var(--accent)"
 	>
-		<p class="text-xs font-medium text-muted-foreground">
-			{article.source} · {publishedLabel}
+		<p
+			class="flex flex-wrap items-center gap-x-2 text-xs font-bold tracking-[0.16em] text-muted-foreground uppercase"
+		>
+			<span class="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[var(--accent-foreground)]"
+				>{article.section}</span
+			>
+			<span class="normal-case"
+				>{article.source}{#if article.author}
+					· {article.author}{/if} · {publishedLabel}</span
+			>
 		</p>
-		<h1 class="mt-1.5 text-xl leading-snug font-bold text-balance text-foreground sm:text-2xl">
+		<h1
+			class="mt-2 font-heading text-[clamp(1.375rem,1rem+1.8vw,2.25rem)] leading-[1.08] font-black text-balance text-foreground"
+		>
 			{article.headline}
 		</h1>
 	</div>
