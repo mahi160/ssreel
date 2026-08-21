@@ -47,16 +47,30 @@
 		if (reduceMotion || !container) return;
 
 		const el = container;
+		// Index the drag started from — without this, InertiaPlugin's own
+		// velocity-projected end value on a fast flick could land two or three
+		// cards away, which reads as randomly skipping articles, not paging.
+		// Clamping the snap target to at most one card from the press point is
+		// what makes a hard flick feel the same as a gentle one: always exactly
+		// one card, just faster.
+		let startIndex = 0;
 		// A single function form applies directly to the drag's one axis (type:
 		// 'scroll' here is vertical-only) — GSAP's own runtime also accepts a
 		// { scrollTop } object for this, but its types don't declare that key.
 		const [instance] = Draggable.create(el, {
 			type: 'scroll',
 			inertia: true,
+			maxDuration: 0.5,
+			minDuration: 0.2,
+			onPress() {
+				startIndex = Math.round(el.scrollTop / (el.clientHeight * 0.92));
+			},
 			// Cards are 92dvh tall (the peek), so that's the snap increment too.
 			snap: (value: number) => {
 				const card = el.clientHeight * 0.92;
-				return Math.round(value / card) * card;
+				const target = Math.round(value / card);
+				const clamped = Math.max(startIndex - 1, Math.min(startIndex + 1, target));
+				return clamped * card;
 			}
 		});
 		return () => instance.kill();
