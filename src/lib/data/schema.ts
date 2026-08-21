@@ -33,6 +33,7 @@ export interface Article {
 	section: Section;
 	url: string;
 	source: string;
+	author?: string; // byline, when the outlet's page carries one
 	language?: Language; // optional for articles cached before language filters existed
 	publishedAt: string; // ISO 8601
 	runId: string;

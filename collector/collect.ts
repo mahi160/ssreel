@@ -95,6 +95,7 @@ async function collectSource(source: Source, runId: string): Promise<Article[]> 
 					section: classifySection(item.link!, item.categories ?? [], source.defaultSection),
 					url: item.link!,
 					source: source.name,
+					author: extracted?.author,
 					language: source.language,
 					publishedAt: item.isoDate ?? new Date().toISOString(),
 					runId,
