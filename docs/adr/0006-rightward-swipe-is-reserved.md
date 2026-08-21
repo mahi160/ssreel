@@ -1,3 +1,8 @@
+---
+status: superseded by ADR-0012 (vertical paging mechanism only; the no-rightward-
+swipe decision stands)
+---
+
 # Rightward swipe is deliberately left unassigned
 
 Vertical swipes page between articles — plain scroll-snap, not a custom gesture.
