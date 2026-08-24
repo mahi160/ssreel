@@ -60,12 +60,8 @@
 	<header class="press-card border bg-card p-4 sm:p-5">
 		<div class="flex items-start justify-between gap-4">
 			<div>
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
-					Desk controls
-				</p>
-				<h1
-					class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em] sm:text-4xl"
-				>
+				<p class="text-eyebrow">Desk controls</p>
+				<h1 class="mt-2 font-heading text-3xl leading-none font-black tracking-tight sm:text-4xl">
 					Tune feed
 				</h1>
 			</div>
@@ -76,15 +72,11 @@
 	</header>
 
 	<div class="grid gap-4 lg:grid-cols-[1fr_1fr]">
-		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+		<section class="rounded-3xl border bg-card p-4 sm:p-5">
 			<div class="mb-4 flex items-end justify-between gap-4 border-b pb-4">
 				<div>
-					<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
-						Sections
-					</p>
-					<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
-						Keep on desk
-					</h2>
+					<p class="text-eyebrow">Sections</p>
+					<h2 class="font-heading text-xl leading-none font-black tracking-tight">Keep on desk</h2>
 				</div>
 			</div>
 			<div class="grid gap-2">
@@ -107,14 +99,14 @@
 			</div>
 		</section>
 
-		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+		<section class="rounded-3xl border bg-card p-4 sm:p-5">
 			<div class="mb-4 border-b pb-4">
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Reading</p>
-				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">Pass speed</h2>
+				<p class="text-eyebrow">Reading</p>
+				<h2 class="font-heading text-xl leading-none font-black tracking-tight">Pass speed</h2>
 			</div>
 
 			<div class="grid gap-3 rounded-2xl border bg-card/75 p-4">
-				<p class="text-xs font-bold tracking-[0.24em] text-muted-foreground uppercase">Theme</p>
+				<p class="text-meta">Theme</p>
 				<div class="flex flex-wrap gap-2">
 					{#each darkModes as mode (mode)}
 						<Button
@@ -129,7 +121,7 @@
 			</div>
 
 			<div class="mt-4 grid gap-3 rounded-2xl border bg-card/75 p-4">
-				<p class="text-xs font-bold tracking-[0.24em] text-muted-foreground uppercase">Language</p>
+				<p class="text-meta">Language</p>
 				<div class="flex flex-wrap gap-2">
 					{#each languageFilters as languageFilter (languageFilter)}
 						<Button
@@ -163,7 +155,7 @@
 			</div>
 
 			<div class="mt-4 rounded-2xl border bg-card/75 p-4">
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Storage</p>
+				<p class="text-eyebrow">Storage</p>
 				<p class="mt-2 text-sm text-muted-foreground">
 					{articleCount} article{articleCount === 1 ? '' : 's'} stored{storageBytes !== undefined
 						? ` · ${formatBytes(storageBytes)} used`
@@ -177,12 +169,10 @@
 	</div>
 
 	{#if sources.length > 0}
-		<section class="rounded-3xl border bg-[var(--press-glass)] p-4 backdrop-blur-xl sm:p-5">
+		<section class="rounded-3xl border bg-card p-4 sm:p-5">
 			<div class="mb-4 border-b pb-4">
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Sources</p>
-				<h2 class="font-heading text-xl leading-none font-black tracking-[-0.02em]">
-					Open channels
-				</h2>
+				<p class="text-eyebrow">Sources</p>
+				<h2 class="font-heading text-xl leading-none font-black tracking-tight">Open channels</h2>
 			</div>
 			<div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
 				{#each sources as source (source)}
