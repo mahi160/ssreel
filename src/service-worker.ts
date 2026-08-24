@@ -14,9 +14,19 @@ import { IMMUTABLE_CACHE, DATA_CACHE } from '#lib/data/cacheNames.js';
 // global is missing in dev — fall back to a fixed dev cache name instead of
 // crashing the SW's evaluation.
 declare const __BUILD_ID__: string | undefined;
-const SHELL_CACHE = `ssreel-shell-${typeof __BUILD_ID__ === 'undefined' ? 'dev' : __BUILD_ID__}`;
+const isDev = typeof __BUILD_ID__ === 'undefined';
+const SHELL_CACHE = `ssreel-shell-${isDev ? 'dev' : __BUILD_ID__}`;
 
 self.addEventListener('install', (event) => {
+	// Dev's module URLs aren't content-hashed per build like prod's are, so
+	// there's no per-build cache-busting here — cache-first would serve the
+	// same stale JS/CSS for the entire life of the dev cache. skipWaiting still
+	// runs, so an updated worker still replaces whatever stale one is already
+	// controlling the page.
+	if (isDev) {
+		event.waitUntil(self.skipWaiting());
+		return;
+	}
 	event.waitUntil(
 		caches
 			.open(SHELL_CACHE)
@@ -79,6 +89,7 @@ async function navigationFirst(request) {
 
 self.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET') return;
+	if (isDev) return; // let the browser hit the network directly, uncached
 	const url = new URL(event.request.url);
 	if (url.origin !== location.origin) return;
 

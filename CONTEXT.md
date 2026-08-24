@@ -127,8 +127,11 @@ _Avoid_: Retention, history, archive depth
 **Retention**:
 How long a device keeps a synced article, and its cached image, before purging it
 from local storage. Evicted uniformly by publish time regardless of read state,
-longer than the Window and tracked independently of it — once an article ages out
-here it cannot be re-synced, since the collector no longer publishes it either.
+tracked independently of the Window even though currently the same length — once
+an article ages out here it cannot be re-synced, since the collector no longer
+publishes it either. Eviction is deferred while a run's articles are on screen
+(ADR-0014): it lands on the next app open, an explicit jump to the latest
+edition, or a manual refresh, never silently under a reader mid-article.
 _Avoid_: Window, cache duration, history depth
 
 **Sync**:

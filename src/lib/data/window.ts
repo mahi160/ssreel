@@ -2,6 +2,7 @@
 export const WINDOW_DAYS = 1;
 
 // How long a device keeps what it has already synced before evicting it
-// (ADR-0011). Deliberately longer than, and independent of, WINDOW_DAYS —
-// a reader's own history outlives what the collector currently publishes.
-export const RETENTION_DAYS = 3;
+// (ADR-0011, value revised by ADR-0014). Independent of WINDOW_DAYS even
+// though currently equal to it — the reel should look like the last 24h
+// of the wire, not a multi-day archive.
+export const RETENTION_DAYS = 1;
