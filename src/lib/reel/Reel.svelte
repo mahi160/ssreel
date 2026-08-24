@@ -34,7 +34,10 @@
      Paging is plain CSS scroll-snap (ADR-0013, reverting ADR-0012) — the
      browser's own touch/momentum handling is what a hand-rolled JS drag
      library was never going to out-perform. -->
-<div class="h-dvh w-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
+<div
+	data-reel-scroller
+	class="h-dvh w-full snap-y snap-mandatory overflow-y-auto overscroll-contain"
+>
 	{#each articles as article (article.id)}
 		<ArticleCard
 			{article}

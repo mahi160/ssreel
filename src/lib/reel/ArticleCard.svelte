@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { StoredArticle } from '#lib/data/db.js';
 	import { dwellTracker } from './dwell.js';
+	import { stackMotion } from './stackMotion.js';
 	import ArticleContent from './ArticleContent.svelte';
 
 	let {
@@ -16,13 +17,22 @@
 	} = $props();
 </script>
 
-<!-- 92dvh, not 100dvh: the next card's top edge always peeks underneath,
-     a constant "there's a stack here" cue. will-change promotes each card to
-     its own compositor layer, so paging doesn't repaint siblings (ADR-0013). -->
+<!-- Full height, no peek — the stacked-card depth cue is the scroll-linked
+     scale/fade from stackMotion now, not a sliver of the next image showing
+     underneath.
+
+     The scale/fade lands on the inner wrapper, not this outer div: this outer
+     one is the actual scroll-snap target, and browsers factor a transformed
+     element's rendered box into snap-point math — scaling it directly made
+     native snapping visibly jittery. This stays a stable, untransformed snap
+     target; will-change (for its own compositor layer, so paging doesn't
+     repaint siblings — ADR-0013) moves to the element that actually animates. -->
 <div
-	class="h-[92dvh] w-full snap-start snap-always will-change-transform"
+	class="h-dvh w-full snap-start snap-always"
 	data-article-id={article.id}
 	use:dwellTracker={{ onActive, onRead }}
 >
-	<ArticleContent {article} {onHide} />
+	<div class="h-full w-full will-change-transform" use:stackMotion>
+		<ArticleContent {article} {onHide} />
+	</div>
 </div>

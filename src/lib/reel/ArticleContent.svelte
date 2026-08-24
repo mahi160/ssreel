@@ -65,7 +65,7 @@
 			<button
 				type="button"
 				aria-label="Hide article"
-				class="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white transition hover:bg-black/55 focus-visible:outline focus-visible:outline-white"
+				class="absolute top-[calc(4rem+env(safe-area-inset-top))] right-3 flex size-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white transition hover:bg-black/55 focus-visible:outline focus-visible:outline-white lg:top-[calc(0.75rem+env(safe-area-inset-top))]"
 				onclick={handleHide}
 			>
 				<IconX size={18} />
@@ -84,9 +84,7 @@
 		class="relative -mt-5 shrink-0 border-t border-l-[3px] border-dashed bg-card px-5 pt-4 pb-3 sm:rounded-tl-3xl sm:px-7"
 		style="border-left-color: var(--accent)"
 	>
-		<p
-			class="flex flex-wrap items-center gap-x-2 text-xs font-bold tracking-[0.16em] text-muted-foreground uppercase"
-		>
+		<p class="text-meta flex flex-wrap items-center gap-x-2">
 			<span class="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[var(--accent-foreground)]"
 				>{article.section}</span
 			>

@@ -51,12 +51,8 @@
 	<header class="press-card border bg-card p-4 sm:p-5">
 		<div class="flex items-start justify-between gap-4">
 			<div>
-				<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">
-					Article ledger
-				</p>
-				<h1
-					class="mt-2 font-heading text-3xl leading-none font-black tracking-[-0.04em] sm:text-4xl"
-				>
+				<p class="text-eyebrow">Article ledger</p>
+				<h1 class="mt-2 font-heading text-3xl leading-none font-black tracking-tight sm:text-4xl">
 					Clips
 				</h1>
 			</div>
@@ -68,7 +64,7 @@
 
 	<Tabs.Root
 		bind:value={filter}
-		class="min-h-0 flex-1 overflow-hidden rounded-3xl border bg-[var(--press-glass)] p-2 backdrop-blur-xl"
+		class="min-h-0 flex-1 overflow-hidden rounded-3xl border bg-card p-2"
 	>
 		<Tabs.List
 			variant="line"
@@ -92,15 +88,13 @@
 							<span class="rounded-full bg-[var(--accent)]" aria-hidden="true"></span>
 							<div class="min-w-0">
 								<p class="truncate font-semibold text-muted-foreground">{article.headline}</p>
-								<p
-									class="mt-1 text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase"
-								>
+								<p class="text-meta mt-1">
 									<span class="block truncate"
 										>{article.source} · {article.section} · {LANGUAGE_LABEL[
 											articleLanguage(article)
 										]}</span
 									>
-									<span class="block text-foreground/70">{stamp(article.publishedAt)}</span>
+									<span class="block font-mono normal-case">{stamp(article.publishedAt)}</span>
 								</p>
 							</div>
 							<Button variant="outline" size="sm" onclick={() => restore(article.id)}
@@ -122,15 +116,13 @@
 								>
 									{article.headline}
 								</span>
-								<span
-									class="mt-1 block text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase"
-								>
+								<span class="text-meta mt-1 block">
 									<span class="block truncate">
 										{article.source} · <span class="text-[var(--accent)]">{article.section}</span> · {LANGUAGE_LABEL[
 											articleLanguage(article)
 										]}
 									</span>
-									<span class="block text-foreground/70">{stamp(article.publishedAt)}</span>
+									<span class="block font-mono normal-case">{stamp(article.publishedAt)}</span>
 								</span>
 							</span>
 						</a>

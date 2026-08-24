@@ -73,12 +73,10 @@
 </script>
 
 <div class="hidden h-dvh w-full grid-cols-[22rem_1fr] gap-8 overflow-hidden p-6 lg:grid">
-	<aside
-		class="flex min-h-0 flex-col rounded-3xl border bg-[var(--press-glass)] shadow-[0_24px_80px_color-mix(in_oklch,var(--foreground)_14%,transparent)] backdrop-blur-xl"
-	>
+	<aside class="flex min-h-0 flex-col rounded-3xl border bg-card">
 		<div class="border-b p-5">
-			<p class="text-xs font-bold tracking-[0.32em] text-muted-foreground uppercase">Wire stack</p>
-			<p class="mt-2 font-heading text-xl leading-none font-black tracking-[-0.02em]">
+			<p class="text-eyebrow">Wire stack</p>
+			<p class="mt-2 font-heading text-xl leading-none font-black tracking-tight">
 				{articles.length} unread
 			</p>
 		</div>
@@ -108,12 +106,10 @@
 						></span>
 						<span class="min-w-0">
 							<span class="block truncate text-sm font-semibold">{article.headline}</span>
-							<span
-								class="mt-1 block truncate text-[0.68rem] font-bold tracking-[0.18em] text-muted-foreground uppercase"
-							>
+							<span class="text-meta mt-1 block truncate">
 								{article.section} · {article.source}
 							</span>
-							<span class="mt-0.5 block truncate text-[0.68rem] text-muted-foreground/80">
+							<span class="mt-0.5 block truncate font-mono text-xs text-muted-foreground">
 								{stamp(article.publishedAt)}
 							</span>
 						</span>
